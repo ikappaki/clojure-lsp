@@ -2,8 +2,8 @@ name: CI
 
 on:
   push:
-    branches:
-      - master
+    # branches:
+    #   - master
     paths-ignore:
       - '**/README.md'
       - '**/CHANGELOG.md'
@@ -22,7 +22,7 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2.2.0
         with:
@@ -36,24 +36,25 @@ jobs:
       - name: Install Babashka
         run: curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install | sudo bash
 
-      - name: Compile java classes
-        run: make classes
+      # - name: Compile java classes
+      #   run: make classes
 
-      - name: Check if namespaces are clean
-        run: make lint-clean
+      # - name: Check if namespaces are clean
+      #   run: make lint-clean
 
-      - name: Check if namespaces are formatted
-        run: make lint-format
+      # - name: Check if namespaces are formatted
+      #   run: make lint-format
 
-      - name: Check if namespaces have no diagnostics
-        run: make lint-diagnostics
+      # - name: Check if namespaces have no diagnostics
+      #   run: make lint-diagnostics
 
   unit-test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
-        jdk: [8, 11, 15, 17]
+        jdk: [8]
+        # jdk: [8, 11, 15, 17]
     steps:
       - uses: actions/checkout@v2.2.0
         with:
@@ -70,117 +71,120 @@ jobs:
           cli: '1.10.3.1013'
 
       - name: Run tests
-        run: make test
-
-  jvm-integration-test:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        jdk: [8, 11, 15, 17]
-    steps:
-      - uses: actions/checkout@v2.2.0
-        with:
-          fetch-depth: 0
-
-      - name: Set up JDK ${{ matrix.jdk }}
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ matrix.jdk }}
-
-      - name: Install Clojure
-        uses: DeLaGuardo/setup-clojure@master
-        with:
-          cli: '1.10.3.1013'
-
-      - name: Install Babashka
-        run: curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install | sudo bash
-
-      - name: Generate embedded binary
-        run: make prod-cli
-
-      - name: Run integration tests
-        run: make integration-test
-
-      - name: Run babashka pod tests
-        run: make pod-test
-
-  graalvm-build:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v2
-      - name: Prepare java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-
-      - name: Install Clojure
-        uses: DeLaGuardo/setup-clojure@master
-        with:
-          cli: '1.10.3.1013'
-
-      - name: Install Babashka
-        run: curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install | sudo bash
-
-      - uses: graalvm/setup-graalvm@v1
-        with:
-          version: '22.0.0.2'
-          java-version: '11'
-          components: 'native-image'
-          native-image-musl: 'true'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build Linux native image
-        env:
-          CLOJURE_LSP_XMX: "-J-Xmx6g"
-          CLOJURE_LSP_STATIC: true
-          CLOJURE_LSP_MUSL: true
+        # run: make test
         run: |
-          make native-cli
+          cd lib
+          clojure -M:test --focus clojure-lsp.classpath-test
 
-      - name: Compress binary
-        uses: svenstaro/upx-action@v2
-        with:
-          file: clojure-lsp
+  # jvm-integration-test:
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       jdk: [8, 11, 15, 17]
+  #   steps:
+  #     - uses: actions/checkout@v2.2.0
+  #       with:
+  #         fetch-depth: 0
 
-      - name: Upload
-        uses: actions/upload-artifact@v2
-        with:
-          name: clojure-lsp-native
-          path: clojure-lsp
+  #     - name: Set up JDK ${{ matrix.jdk }}
+  #       uses: actions/setup-java@v1
+  #       with:
+  #         java-version: ${{ matrix.jdk }}
 
-  graalvm-integration-test:
-    needs: graalvm-build
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v2
+  #     - name: Install Clojure
+  #       uses: DeLaGuardo/setup-clojure@master
+  #       with:
+  #         cli: '1.10.3.1013'
 
-      - name: Install Clojure
-        uses: DeLaGuardo/setup-clojure@master
-        with:
-          cli: '1.10.3.1013'
+  #     - name: Install Babashka
+  #       run: curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install | sudo bash
 
-      - name: Install Babashka
-        run: curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install | sudo bash
+  #     - name: Generate embedded binary
+  #       run: make prod-cli
 
-      - uses: actions/download-artifact@v2
-        name: clojure-lsp-native
+  #     - name: Run integration tests
+  #       run: make integration-test
 
-      - name: Setup binary
-        run: |
-          cp -rf clojure-lsp-native/clojure-lsp cli/clojure-lsp
-          cp -rf clojure-lsp-native/clojure-lsp clojure-lsp
-          chmod +x cli/clojure-lsp
-          chmod +x clojure-lsp
+  #     - name: Run babashka pod tests
+  #       run: make pod-test
 
-      - name: Run babashka pod tests
-        env:
-          CLOJURE_LSP_TEST_ENV: native
-        run: make pod-test
+  # graalvm-build:
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Prepare java
+  #       uses: actions/setup-java@v1
+  #       with:
+  #         java-version: 11
 
-      - name: Run integration tests
-        run: make integration-test
+  #     - name: Install Clojure
+  #       uses: DeLaGuardo/setup-clojure@master
+  #       with:
+  #         cli: '1.10.3.1013'
+
+  #     - name: Install Babashka
+  #       run: curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install | sudo bash
+
+  #     - uses: graalvm/setup-graalvm@v1
+  #       with:
+  #         version: '22.0.0.2'
+  #         java-version: '11'
+  #         components: 'native-image'
+  #         native-image-musl: 'true'
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  #     - name: Build Linux native image
+  #       env:
+  #         CLOJURE_LSP_XMX: "-J-Xmx6g"
+  #         CLOJURE_LSP_STATIC: true
+  #         CLOJURE_LSP_MUSL: true
+  #       run: |
+  #         make native-cli
+
+  #     - name: Compress binary
+  #       uses: svenstaro/upx-action@v2
+  #       with:
+  #         file: clojure-lsp
+
+  #     - name: Upload
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: clojure-lsp-native
+  #         path: clojure-lsp
+
+  # graalvm-integration-test:
+  #   needs: graalvm-build
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - name: Install Clojure
+  #       uses: DeLaGuardo/setup-clojure@master
+  #       with:
+  #         cli: '1.10.3.1013'
+
+  #     - name: Install Babashka
+  #       run: curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install | sudo bash
+
+  #     - uses: actions/download-artifact@v2
+  #       name: clojure-lsp-native
+
+  #     - name: Setup binary
+  #       run: |
+  #         cp -rf clojure-lsp-native/clojure-lsp cli/clojure-lsp
+  #         cp -rf clojure-lsp-native/clojure-lsp clojure-lsp
+  #         chmod +x cli/clojure-lsp
+  #         chmod +x clojure-lsp
+
+  #     - name: Run babashka pod tests
+  #       env:
+  #         CLOJURE_LSP_TEST_ENV: native
+  #       run: make pod-test
+
+  #     - name: Run integration tests
+  #       run: make integration-test
