@@ -1,8 +1,10 @@
 (ns clojure-lsp.classpath-test
   (:require
+   [babashka.fs :as fs]
    [clojure-lsp.classpath :as classpath]
    [clojure-lsp.shared :as shared]
    [clojure-lsp.test-helper :as h]
+   [clojure.java.shell :as shell]
    [clojure.test :refer [deftest is testing]]))
 
 (deftest default-project-specs-test
@@ -46,3 +48,121 @@
              {:project-path "bb.edn"
               :classpath-cmd ["bb" "print-deps" "--format" "classpath"]}]
             (classpath/default-project-specs #{:something :otherthing}))))))
+
+(defmacro in-ci-env
+  "Return whether the tests are executed in a continuous integrated
+  environment."
+  []
+  (System/getenv "GITHUB_ACTION"))
+
+(defmacro deftest-if-exec
+  "If EXEC is in path, run BODY as `(deftest \"EXEC\" BODY)`, otherwise
+  create an empty `deftest` with a skip message.
+
+  Never skip if running in a continuous integrated enviornment."
+  [exec body]
+
+  (let [exec-str (str exec)]
+    (if (or (in-ci-env) (fs/which exec-str))
+      `(deftest ~exec
+         ~body)
+
+      `(deftest ~exec
+         (testing (str "skipped - exec not in path: " ~exec-str)
+           (is true))))))
+
+(defmacro deftest-if-exec-use-PowerShell-on-windows
+  "If EXEC is in the path, run BODY as `(deftest \"EXEC\" BODY)`,
+  otherwise create an empty `deftest` with a skip message.
+
+  When running on MS-Windows, try to invoke witha all PowerShell
+  shells.
+
+  Never skip if running in a continuous integrated enviornment."
+  [exec body]
+
+  (if-not shared/windows-os?
+    `(deftest-if-exec
+       ~exec
+       ~body)
+
+    (let [exec-str (str exec)
+          in-ci-env? (in-ci-env)]
+      (apply list 'do
+             ;; use any of the known PowerShell shells.
+             (for [ps ["powershell" "pwsh"]]
+               (let [test-sym (symbol (str "windows-" ps "-" exec))]
+                 (if (or in-ci-env? (fs/which ps))
+                   (if (or in-ci-env?
+                           (= 0 (:exit (shell/sh ps "-NoProfile" "-Command" "Get-Command" exec-str))))
+                     `(deftest ~test-sym
+                        ;; only attempt to execute with the current PS
+                        ;; shell.
+                        (with-redefs [classpath/powershell-exec-path #(fs/which ~ps)])
+                        ~body)
+
+                     `(deftest ~test-sym
+                        (testing ~(str "skipped - " exec " not found with " ps)
+                          (is true))))
+
+                   `(deftest ~test-sym
+                      (testing ~(str "skipped - " ps " not in path")
+                        (is true))))))))))
+
+
+(defn make-components
+  [dir project-filename content]
+  "Create a PROJECT-FILENAME file at DIR with the given CONTENT and
+return a clojure-lsp components reference to it."
+  (let [project (.toString (fs/path dir project-filename))
+        db {:project-root-uri (-> dir .toUri .toString)
+            :settings {:project-specs
+                       (classpath/default-project-specs #{})}}]
+    (spit project content)
+    {:db* (atom db)}))
+
+(deftest-if-exec-use-PowerShell-on-windows
+  lein
+
+  (testing "scan lein project"
+    (fs/with-temp-dir
+      [temp-dir]
+      (let [components (make-components temp-dir "project.clj"
+                                        (pr-str '(defproject classpath-lein-test "any")))]
+        (is (seq (classpath/scan-classpath! components)))))))
+
+(deftest-if-exec-use-PowerShell-on-windows
+  clojure
+
+  (testing "scan clojure project"
+    (fs/with-temp-dir
+      [temp-dir]
+      (let [components (make-components temp-dir "deps.edn" (pr-str {}))]
+        (is (seq (classpath/scan-classpath! components)))))))
+
+(deftest-if-exec
+  boot
+
+  (testing "scan boot project"
+    (fs/with-temp-dir
+      [temp-dir]
+      (let [components (make-components temp-dir "build.boot" (pr-str {}))]
+        (is (seq (classpath/scan-classpath! components)))))))
+
+(deftest-if-exec
+  npx
+
+  (testing "scan shadow-cljs project"
+    (fs/with-temp-dir
+      [temp-dir]
+      (let [components (make-components temp-dir "shadow-cljs.edn" (pr-str {}))]
+        (is (seq (classpath/scan-classpath! components)))))))
+
+(deftest-if-exec
+  bb
+
+  (testing "scan babashka project"
+    (fs/with-temp-dir
+      [temp-dir]
+      (let [components (make-components temp-dir "bb.edn" (pr-str {}))]
+        (is (seq (classpath/scan-classpath! components)))))))

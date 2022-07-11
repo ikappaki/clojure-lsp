@@ -1,0 +1,51 @@
+name: cross platform ci
+
+# 1
+on:
+  push:
+    paths-ignore:
+      - '**/README.md'
+      - '**/CHANGELOG.md'
+      - 'deps-lock.json'
+      - 'resources/CLOJURE_LSP_VERSION'
+      - 'docs/**'
+      - 'images/**'
+      - 'mkdocs.yml'
+      - '.github/workflows/bump_deps.yml'
+      - '.github/workflows/bump_downstreams.yml'
+      - '.github/workflows/nightly.yml'
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/release.yml'
+
+  pull_request:
+
+jobs:
+  cross-platform:
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v2.2.0
+        with:
+          fetch-depth: 0
+
+      - name: Prepare java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '8'
+
+      - name: Install Clojure
+        uses: DeLaGuardo/setup-clojure@9.2
+        with:
+          cli: 1.10.3.1013
+          lein: 2.9.1
+          bb: 0.8.157
+          boot: 2.8.3
+      - name: Run x-tests
+        run: |
+          cd lib
+          clojure -M:test --focus clojure-lsp.classpath-test
+
