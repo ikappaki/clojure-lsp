@@ -21,20 +21,20 @@ on:
   pull_request:
 
 jobs:
-  lint:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2.2.0
-        with:
-          fetch-depth: 0
+  # lint:
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v2.2.0
+  #       with:
+  #         fetch-depth: 0
 
-      - name: Install Clojure
-        uses: DeLaGuardo/setup-clojure@master
-        with:
-          cli: '1.10.3.1013'
+  #     - name: Install Clojure
+  #       uses: DeLaGuardo/setup-clojure@master
+  #       with:
+  #         cli: '1.10.3.1013'
 
-      - name: Install Babashka
-        run: curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install | sudo bash
+  #     - name: Install Babashka
+  #       run: curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install | sudo bash
 
       # - name: Compile java classes
       #   run: make classes
@@ -70,8 +70,18 @@ jobs:
         with:
           cli: '1.10.3.1013'
 
+      - name: Install Babashka
+        run: |
+          iwr get.scoop.sh -outfile 'install.ps1'
+          .\install.ps1 -RunAsAdmin
+          scoop bucket add extras
+          scoop bucket add scoop-clojure https://github.com/littleli/scoop-clojure
+          scoop install babashka
+          (Resolve-Path ~\scoop\shims).Path >> $Env:GITHUB_PATH
+
       - name: Run tests
         # run: make test
+        shell: powershell
         run: |
           cd lib
           clojure -M:test --focus clojure-lsp.classpath-test
