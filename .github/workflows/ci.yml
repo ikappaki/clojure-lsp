@@ -71,13 +71,16 @@ jobs:
           cli: '1.10.3.1013'
 
       - name: Install Babashka
-        run: |
-          iwr get.scoop.sh -outfile 'install.ps1'
-          .\install.ps1 -RunAsAdmin
-          scoop bucket add extras
-          scoop bucket add scoop-clojure https://github.com/littleli/scoop-clojure
-          scoop install babashka
-          (Resolve-Path ~\scoop\shims).Path >> $Env:GITHUB_PATH
+        uses: turtlequeue/setup-babashka@v1.5.0
+        with:
+          babashka-version: 0.8.157
+        # run: |
+        #   iwr get.scoop.sh -outfile 'install.ps1'
+        #   .\install.ps1 -RunAsAdmin
+        #   scoop bucket add extras
+        #   scoop bucket add scoop-clojure https://github.com/littleli/scoop-clojure
+        #   scoop install babashka
+        #   (Resolve-Path ~\scoop\shims).Path >> $Env:GITHUB_PATH
 
       - name: Run tests
         # run: make test
