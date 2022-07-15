@@ -49,21 +49,21 @@ jobs:
       #   run: make lint-diagnostics
 
   unit-test:
-    runs-on: windows-latest
+    runs-on: ${{matrix.os}}
+#    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
-        jdk: [8]
-        # jdk: [8, 11, 15, 17]
+        os: [windows-latest]
     steps:
       - uses: actions/checkout@v2.2.0
         with:
           fetch-depth: 0
 
-      - name: Set up JDK ${{ matrix.jdk }}
+      - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: ${{ matrix.jdk }}
+          java-version: 8
 
       - name: Install Clojure
         uses: DeLaGuardo/setup-clojure@master
@@ -74,17 +74,8 @@ jobs:
         uses: turtlequeue/setup-babashka@v1.5.0
         with:
           babashka-version: 0.8.157
-        # run: |
-        #   iwr get.scoop.sh -outfile 'install.ps1'
-        #   .\install.ps1 -RunAsAdmin
-        #   scoop bucket add extras
-        #   scoop bucket add scoop-clojure https://github.com/littleli/scoop-clojure
-        #   scoop install babashka
-        #   (Resolve-Path ~\scoop\shims).Path >> $Env:GITHUB_PATH
 
       - name: Run tests
-        # run: make test
-        shell: powershell
         run: |
           cd lib
           clojure -M:test --focus clojure-lsp.classpath-test

@@ -1,5 +1,6 @@
 (ns clojure-lsp.classpath
   (:require
+   [babashka.fs :as fs]
    [clojure-lsp.settings :as settings]
    [clojure-lsp.shared :as shared]
    [clojure-lsp.source-paths :as source-paths]
@@ -91,6 +92,38 @@
     (into ["pwsh" "-NoProfile" "-Command"] classpath)
     classpath))
 
+(defn ^:private powershell-exec-path
+  "Return the local path to a PowerShell exec file.
+
+  Look up order is:
+
+  pwsh - the name of the executable in PowerShell v6 or later.
+  powershell - the name of the executable prior to v6."
+  []
+  (or (fs/which "pwsh")
+      (fs/which "powershell")))
+
+(defn ^:private classpath-cmd->windows-compatible
+  "Return CLASSPATH-CMD. If running on MS-Windows, update it to be invokable from windows.
+
+  It uses `powershell-exec-path` to locate the PowerShell exec file
+  for invoking the Clojure cli script on MS-Windows."
+  [classpath-cmd]
+  (if shared/windows-os?
+    (let [cmd (first classpath-cmd)]
+      (case cmd
+        "clojure"
+        ;; The Clojure cli tools command is a PowerShell script that
+        ;; must be invoked from PowerShell.
+        (if-let [psh (powershell-exec-path)]
+          (into [(fs/file-name psh) "-NoProfile" "-Command"] classpath-cmd)
+          classpath-cmd)
+
+        ;; else, update executable with extension so that can be
+        ;; invoked by the shell command.
+        (update classpath-cmd 0 #(or (some-> (fs/which %1) fs/file-name) %1))))
+    classpath-cmd))
+
 (defn ^:private lein-source-aliases [source-aliases]
   (some->> source-aliases
            (map #(str "+" (name %)))
@@ -123,4 +156,4 @@
          :classpath-cmd ["npx" "shadow-cljs" "classpath"]}
         {:project-path "bb.edn"
          :classpath-cmd ["bb" "print-deps" "--format" "classpath"]}]
-       (map #(update % :classpath-cmd classpath-cmd->windows-safe-classpath-cmd))))
+       (map #(update % :classpath-cmd classpath-cmd->windows-compatible))))
