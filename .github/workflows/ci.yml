@@ -95,6 +95,8 @@ jobs:
         shell: powershell
         run: |
           # lein -v
+          echo $Env:PATH
+          Get-Command lein
           bb -e '(fs/which ""lein"")'
           bb -e '(fs/which ""powershell"")'
           # cd lib
