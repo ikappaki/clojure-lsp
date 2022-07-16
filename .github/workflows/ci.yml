@@ -94,8 +94,8 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         shell: powershell
         run: |
-          lein -v
-          bb -e '(fs/which "lein")'
+          # lein -v
+          bb -e '(fs/which ""lein"")'
           # cd lib
           # clojure -M:test --focus clojure-lsp.classpath-test
 
