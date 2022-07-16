@@ -54,7 +54,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        # os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [windows-latest]
     steps:
       - uses: actions/checkout@v2.2.0
         with:
@@ -75,7 +76,7 @@ jobs:
           boot: 2.8.3
 
       # no boot on widnows with this action ...
-      - name: Install Clojure
+      - name: Install Clojure (MS-Windows)
         if: ${{ matrix.os == 'windows-latest' }}
         uses: DeLaGuardo/setup-clojure@master
         with:
@@ -83,18 +84,20 @@ jobs:
           lein: 2.9.1
           bb: 0.8.157
 
-      - name: Run tests
-        if: ${{ matrix.os != 'windows-latest' }}
-        run: |
-          cd lib
-          clojure -M:test --focus clojure-lsp.classpath-test
+      # - name: Run tests
+      #   if: ${{ matrix.os != 'windows-latest' }}
+      #   run: |
+      #     cd lib
+      #     clojure -M:test --focus clojure-lsp.classpath-test
 
-      - name: Run tests MS-Windows
+      - name: Run tests (MS-Windows)
         if: ${{ matrix.os == 'windows-latest' }}
         shell: powershell
         run: |
-          cd lib
-          clojure -M:test --focus clojure-lsp.classpath-test
+          lein -v
+          bb -e '(fs/which "lein")'
+          # cd lib
+          # clojure -M:test --focus clojure-lsp.classpath-test
 
           
   # jvm-integration-test:
