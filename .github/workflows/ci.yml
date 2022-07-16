@@ -96,6 +96,7 @@ jobs:
         run: |
           # lein -v
           bb -e '(fs/which ""lein"")'
+          bb -e '(fs/which ""powershell"")'
           # cd lib
           # clojure -M:test --focus clojure-lsp.classpath-test
 
