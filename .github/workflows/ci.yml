@@ -87,15 +87,20 @@ jobs:
 
       - name: Install boot on MS-Windows
         if: ${{ matrix.os == 'windows-latest' }}
-        shell: powershell
+        # shell: powershell
         run: |
-          $env:LOCAL_BIN_DIR="$HOME\.local\bin"
+          iwr get.scoop.sh -outfile 'install.ps1'
+          .\install.ps1 -RunAsAdmin
+          scoop bucket add extras
+          scoop install boot-clj
 
-          if (!(Test-Path $env:LOCAL_BIN_DIR)) {new-item "$env:LOCAL_BIN_DIR" -ItemType directory}
-          iwr -Uri https://github.com/boot-clj/boot-bin/releases/download/latest/boot.exe `
-          -outfile $env:LOCAL_BIN_DIR/boot.exe
-          echo $env:LOCAL_BIN_DIR | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          & "$env:LOCAL_BIN_DIR/boot.exe" -V
+          # $env:LOCAL_BIN_DIR="$HOME\.local\bin"
+
+          # if (!(Test-Path $env:LOCAL_BIN_DIR)) {new-item "$env:LOCAL_BIN_DIR" -ItemType directory}
+          # iwr -Uri https://github.com/boot-clj/boot-bin/releases/download/latest/boot.exe `
+          # -outfile $env:LOCAL_BIN_DIR/boot.exe
+          # echo $env:LOCAL_BIN_DIR | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          # & "$env:LOCAL_BIN_DIR/boot.exe" -V
 
       - name: Run tests
         if: ${{ matrix.os != 'windows-latest' }}
