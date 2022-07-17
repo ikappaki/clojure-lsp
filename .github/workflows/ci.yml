@@ -93,7 +93,7 @@ jobs:
           .\install.ps1 -RunAsAdmin
           scoop bucket add extras
           scoop install boot-clj
-
+          (Resolve-Path ~\scoop\shims).Path >> $Env:GITHUB_PATH
           # $env:LOCAL_BIN_DIR="$HOME\.local\bin"
 
           # if (!(Test-Path $env:LOCAL_BIN_DIR)) {new-item "$env:LOCAL_BIN_DIR" -ItemType directory}
