@@ -62,9 +62,10 @@ jobs:
           fetch-depth: 0
 
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
-          java-version: 8
+          distribution: 'zulu'
+          java-version: '8'
 
       - name: Install Clojure
         if: ${{ matrix.os != 'windows-latest' }}
@@ -94,7 +95,7 @@ jobs:
           iwr -Uri https://github.com/boot-clj/boot-bin/releases/download/latest/boot.exe `
           -outfile $env:LOCAL_BIN_DIR/boot.exe
           echo $env:LOCAL_BIN_DIR | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-           # & "$env:LOCAL_BIN_DIR/boot.exe" -V
+          & "$env:LOCAL_BIN_DIR/boot.exe" -V
 
       - name: Run tests
         if: ${{ matrix.os != 'windows-latest' }}
