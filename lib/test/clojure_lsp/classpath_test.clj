@@ -4,6 +4,7 @@
    [clojure-lsp.classpath :as classpath]
    [clojure-lsp.shared :as shared]
    [clojure-lsp.test-helper :as h]
+   [clojure.java.shell :as shell]
    [clojure.test :refer [deftest is testing]]))
 
 (deftest default-project-specs-test
@@ -75,9 +76,67 @@
            (testing (str "skipped - exec not in path: " ~exec-str)
              (is true)))))))
 
-(deftest-if-exec
-  lein :any-arch
+(comment
+  (shell/sh "powershell" "-NoProfile" "-Command" "Get-Command" "leins")
 
+  )
+(defmacro deftest-if-exec-with-powershell
+  "If EXEC is in the path and ARCH matches the system architecture, run
+  BODY as `(deftest \"EXEC\" BODY)`, otherwise create an empty
+  `deftest` with a skip message.
+
+  Possible values for ARCH are:
+
+  :windows - for MS-Windows.
+
+  :any-arch - any architecture."
+  [exec body]
+
+  (if-not shared/windows-os?
+    `(deftest-if-exec
+       ~exec :any-arch
+       ~body)
+
+    (let [exec-str (str exec)]
+      (apply list 'do
+             (for [ps ["powershell" "pwsh"]]
+               (let [test-sym (symbol (str "windows-" ps "-" exec))]
+                 (if-not (fs/which ps)
+                   `(deftest ~test-sym
+                      (testing ~(str "skipped - " ps " not in path")
+                        (is true)))
+
+                   (if-not (= 0 (:exit (shell/sh ps "-NoProfile" "-Command" "Get-Command" exec-str)))
+                     `(deftest ~test-sym
+                        (testing ~(str "skipped - " exec " not found with " ps)
+                          (is true)))
+
+                     `(deftest ~test-sym
+                        (with-redefs [classpath/powershell-exec-path #(fs/which ~ps)])
+                        ~body)))))))))
+
+
+(comment
+  (macroexpand-1  '(deftest-if-exec-with-powershell
+                     lein
+                    1
+                    ;; (fs/with-temp-dir
+                    ;;    [temp-dir]
+                    ;;    ;; (let [project (.toString (fs/path temp-dir "project.clj"))
+                    ;;    ;;       content (pr-str '(defproject classpath-lein-test "any"))
+                    ;;    ;;       db {:project-root-uri (-> temp-dir .toUri .toString)
+                    ;;    ;;           :settings {:project-specs
+                    ;;    ;;     (classpath/default-project-specs #{})}}]
+                    ;;    ;;   (spit project content)
+                    ;;    ;;   (is (seq (classpath/scan-classpath! {:db* (atom db)}))))
+                    ;;    )
+                     ) )
+
+
+  )
+
+(deftest-if-exec-with-powershell
+  lein
   (testing "scan project"
     (fs/with-temp-dir
       [temp-dir]
@@ -89,8 +148,8 @@
         (spit project content)
         (is (seq (classpath/scan-classpath! {:db* (atom db)})))))))
 
-(deftest-if-exec
-  clojure :any-arch
+(deftest-if-exec-with-powershell
+  clojure
 
   (testing "scan project"
     (fs/with-temp-dir
@@ -102,33 +161,33 @@
         (spit project content)
         (is (seq (classpath/scan-classpath! {:db* (atom db)})))))))
 
-(deftest-if-exec
-  powershell :windows
+;; (deftest-if-exec
+;;   powershell :windows
 
-  (testing "clojure tools scan project"
-    (fs/with-temp-dir
-      [temp-dir]
-      (let [project (.toString (fs/path temp-dir "deps.edn"))
-            content (pr-str {})
-            db {:project-root-uri (-> temp-dir .toUri .toString)
-                :settings {:project-specs (classpath/default-project-specs #{})}}]
-        (spit project content)
-        (with-redefs [classpath/powershell-exec-path #(fs/which "powershell")]
-          (is (seq (classpath/scan-classpath! {:db* (atom db)}))))))))
+;;   (testing "clojure tools scan project"
+;;     (fs/with-temp-dir
+;;       [temp-dir]
+;;       (let [project (.toString (fs/path temp-dir "deps.edn"))
+;;             content (pr-str {})
+;;             db {:project-root-uri (-> temp-dir .toUri .toString)
+;;                 :settings {:project-specs (classpath/default-project-specs #{})}}]
+;;         (spit project content)
+;;         (with-redefs [classpath/powershell-exec-path #(fs/which "powershell")]
+;;           (is (seq (classpath/scan-classpath! {:db* (atom db)}))))))))
 
-(deftest-if-exec
-  pwsh :windows
+;; (deftest-if-exec
+;;   pwsh :windows
 
-  (testing "clojure tools scan project"
-    (fs/with-temp-dir
-      [temp-dir]
-      (let [project (.toString (fs/path temp-dir "deps.edn"))
-            content (pr-str {})
-            db {:project-root-uri (-> temp-dir .toUri .toString)
-                :settings {:project-specs (classpath/default-project-specs #{})}}]
-        (spit project content)
-        (with-redefs [classpath/powershell-exec-path #(fs/which "pwsh")]
-          (is (seq (classpath/scan-classpath! {:db* (atom db)}))))))))
+;;   (testing "clojure tools scan project"
+;;     (fs/with-temp-dir
+;;       [temp-dir]
+;;       (let [project (.toString (fs/path temp-dir "deps.edn"))
+;;             content (pr-str {})
+;;             db {:project-root-uri (-> temp-dir .toUri .toString)
+;;                 :settings {:project-specs (classpath/default-project-specs #{})}}]
+;;         (spit project content)
+;;         (with-redefs [classpath/powershell-exec-path #(fs/which "pwsh")]
+;;           (is (seq (classpath/scan-classpath! {:db* (atom db)}))))))))
 
 (deftest-if-exec
   boot :any-arch

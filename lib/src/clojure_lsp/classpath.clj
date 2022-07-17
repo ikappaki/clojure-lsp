@@ -111,16 +111,19 @@
   [classpath-cmd]
   (if shared/windows-os?
     (let [cmd (first classpath-cmd)]
-      (case cmd
-        "clojure"
-        ;; The Clojure cli tools command is a PowerShell script that
-        ;; must be invoked from PowerShell.
+      (cond
+        (#{"clojure" "lein"} cmd)
+        ;; The Clojure cli tools command is a PowerShell script.
+        ;;
+        ;; The Leiningen command can be a .cmd, .bat or .ps1 file. Use
+        ;; PowerShell as a catch all invoker.
         (if-let [psh (powershell-exec-path)]
           (into [(fs/file-name psh) "-NoProfile" "-Command"] classpath-cmd)
           classpath-cmd)
 
-        ;; else, update executable with extension so that can be
-        ;; invoked by the shell command.
+        :else
+        ;; Update executable with extension so that can be invoked by
+        ;; the shell command.
         (update classpath-cmd 0 #(or (some-> (fs/which %1) fs/file-name) %1))))
     classpath-cmd))
 
