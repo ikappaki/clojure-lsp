@@ -94,7 +94,7 @@ jobs:
           iwr -Uri https://github.com/boot-clj/boot-bin/releases/download/latest/boot.exe `
           -outfile $env:LOCAL_BIN_DIR/boot.exe
           echo $env:LOCAL_BIN_DIR | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          & "$env:LOCAL_BIN_DIR/boot.exe" -V
+           # & "$env:LOCAL_BIN_DIR/boot.exe" -V
 
       - name: Run tests
         if: ${{ matrix.os != 'windows-latest' }}
