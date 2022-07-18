@@ -76,13 +76,13 @@ jobs:
           boot: 2.8.3
 
       # no boot on widnows with this action ...
-      # - name: Install Clojure (MS-Windows)
-      #   if: ${{ matrix.os == 'windows-latest' }}
-      #   uses: DeLaGuardo/setup-clojure@master
-      #   with:
-      #     cli: 1.10.3.1013
-      #     lein: 2.9.1
-      #     bb: 0.8.157
+      - name: Install Clojure (MS-Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: DeLaGuardo/setup-clojure@master
+        with:
+          cli: 1.10.3.1013
+          lein: 2.9.1
+          bb: 0.8.157
 
       - name: Install boot on MS-Windows
         if: ${{ matrix.os == 'windows-latest' }}
