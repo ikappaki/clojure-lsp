@@ -62,9 +62,8 @@ jobs:
           fetch-depth: 0
 
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v1
         with:
-          distribution: 'temurin'
           java-version: '8'
 
       - name: Install Clojure
@@ -94,14 +93,14 @@ jobs:
           # scoop bucket add extras
           # scoop install boot-clj
           # (Resolve-Path ~\scoop\shims).Path >> $Env:GITHUB_PATH
-          $env:LOCAL_BIN_DIR="$HOME\.local\bin"
+          $env:BOOT_BIN_DIR="$HOME\.boot\bin"
 
-          if (!(Test-Path $env:LOCAL_BIN_DIR)) {new-item "$env:LOCAL_BIN_DIR" -ItemType directory}
+          if (!(Test-Path $env:BOOT_BIN_DIR)) {new-item "$env:BOOT_BIN_DIR" -ItemType directory}
           iwr -Uri https://github.com/boot-clj/boot-bin/releases/download/latest/boot.exe `
-          -outfile $env:LOCAL_BIN_DIR/boot.exe
-          echo $env:LOCAL_BIN_DIR | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          -outfile $env:BOOT_BIN_DIR/boot.exe
+          echo $env:BOOT_BIN_DIR | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           reg add "HKLM\SOFTWARE\JavaSoft\Java Development Kit\1.8" /v JAVAHome /d "$env:JAVA_HOME" /f
-          & "$env:LOCAL_BIN_DIR/boot.exe" -V
+          & "$env:BOOT_BIN_DIR/boot.exe" -V
 
       - name: Run tests
         if: ${{ matrix.os != 'windows-latest' }}
@@ -118,7 +117,7 @@ jobs:
           # Get-Command lein
           # bb -e '(fs/which ""lein"")'
           # bb -e '(fs/which ""powershell"")'
-          java --version
+          # java --version
           boot -V
           cd lib
           clojure -M:test --focus clojure-lsp.classpath-test
