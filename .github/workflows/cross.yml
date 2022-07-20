@@ -1,4 +1,4 @@
-name: CI
+name: cross platform tests
 
 on:
   push:
@@ -56,7 +56,6 @@ jobs:
           bb: 0.8.157
       - name: Install boot on MS-Windows
         if: ${{ matrix.os == 'windows-latest' }}
-        # shell: powershell
         run: |
           $env:BOOT_BIN_DIR="$HOME\.boot\bin"
 
@@ -70,7 +69,6 @@ jobs:
           & "$env:BOOT_BIN_DIR/boot.exe" -V
 
       - name: Run cross platform tests
-        shell: powershell
         run: |
           cd lib
           clojure -M:test --focus clojure-lsp.classpath-test
