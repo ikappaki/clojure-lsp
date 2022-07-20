@@ -36,20 +36,21 @@ jobs:
         with:
           java-version: '8'
 
-      - name: Install Clojure
-        if: ${{ matrix.os != 'windows-latest' }}
-        uses: DeLaGuardo/setup-clojure@master
-        with:
-          cli: 1.10.3.1013
-          lein: 2.9.1
-          bb: 0.8.157
-          boot: 2.8.3
+      # - name: Install Clojure
+      #   if: ${{ matrix.os != 'windows-latest' }}
+      #   uses: ikappaki/setup-clojure@issue/pwsh
+      #   with:
+      #     cli: 1.10.3.1013
+      #     lein: 2.9.1
+      #     bb: 0.8.157
+      #     boot: 2.8.3
 
       # boot is not yet available with this action, install separately.
       # see https://github.com/DeLaGuardo/setup-clojure/issues/57.
       - name: Install Clojure (MS-Windows)
         if: ${{ matrix.os == 'windows-latest' }}
-        uses: DeLaGuardo/setup-clojure@master
+        # uses: DeLaGuardo/setup-clojure@master
+        uses: ikappaki/setup-clojure@issue/pwsh
         with:
           cli: 1.10.3.1013
           lein: 2.9.1
@@ -71,12 +72,14 @@ jobs:
       - name: Run cross platform tests
         shell: powershell
         run: |
-          & pwsh -NoProfile -Command clojure --version
+          clojure --version
+          # & pwsh -NoProfile -Command clojure --version
           # cd lib
           # clojure -M:test --focus clojure-lsp.classpath-test
 
-      # - name: Run cross platform tests pwsh
-      #   run: |
-      #     Get-Command
-      #     # cd lib
-      #     # clojure -M:test --focus clojure-lsp.classpath-test
+      - name: Run cross platform tests pwsh
+        run: |
+          Get-Command
+          clojure --version
+          # cd lib
+          # clojure -M:test --focus clojure-lsp.classpath-test
