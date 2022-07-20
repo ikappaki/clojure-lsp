@@ -118,7 +118,7 @@ jobs:
           # bb -e '(fs/which ""lein"")'
           # bb -e '(fs/which ""powershell"")'
           # java --version
-          boot -V
+          #boot -V
           cd lib
           clojure -M:test --focus clojure-lsp.classpath-test
 

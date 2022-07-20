@@ -49,64 +49,71 @@
               :classpath-cmd ["bb" "print-deps" "--format" "classpath"]}]
             (classpath/default-project-specs #{:something :otherthing}))))))
 
+(defmacro in-ci-env
+  "Return whether the tests are executed in a continuous integrated
+  environment."
+  []
+  (System/getenv "GITHUB_ACTION"))
+
 (defmacro deftest-if-exec
   "If EXEC is in path, run BODY as `(deftest \"EXEC\" BODY)`, otherwise
-  create an empty `deftest` with a skip message."
+  create an empty `deftest` with a skip message.
+
+  Never skip if running in a continuous integrated enviornment."
   [exec body]
 
   (let [exec-str (str exec)]
-    (if (not shared/windows-os?)
+    (if (or (in-ci-env) (fs/which exec-str))
       `(deftest ~exec
-         (testing (str "skipped - not on MS-Windows")
-           (is true)))
+         ~body)
 
-      (if (fs/which exec-str)
-        `(deftest ~exec
-           ~body)
-
-        `(deftest ~exec
-           (testing (str "skipped - exec not in path: " ~exec-str)
-             (is true)))))))
+      `(deftest ~exec
+         (testing (str "skipped - exec not in path: " ~exec-str)
+           (is true))))))
 
 (defmacro deftest-if-exec-use-PowerShell-on-windows
   "If EXEC is in the path, run BODY as `(deftest \"EXEC\" BODY)`,
   otherwise create an empty `deftest` with a skip message.
 
   When running on MS-Windows, try to invoke witha all PowerShell
-  shells, skip if not installed."
+  shells.
+
+  Never skip if running in a continuous integrated enviornment."
   [exec body]
 
   (if-not shared/windows-os?
     `(deftest-if-exec
-       ~exec :any-arch
+       ~exec
        ~body)
 
-    (let [exec-str (str exec)]
+    (let [exec-str (str exec)
+          in-ci-env? (in-ci-env)]
       (apply list 'do
              ;; use any of the known PowerShell shells.
              (for [ps ["powershell" "pwsh"]]
                (let [test-sym (symbol (str "windows-" ps "-" exec))]
-                 (if-not (fs/which ps)
-                   `(deftest ~test-sym
-                      (testing ~(str "skipped - " ps " not in path")
-                        (is true)))
-
-                   (if-not (= 0 (:exit (shell/sh ps "-NoProfile" "-Command" "Get-Command" exec-str)))
-                     `(deftest ~test-sym
-                        (testing ~(str "skipped - " exec " not found with " ps)
-                          (is true)))
-
+                 (if (or in-ci-env? (fs/which ps))
+                   (if (or in-ci-env?
+                           (= 0 (:exit (shell/sh ps "-NoProfile" "-Command" "Get-Command" exec-str))))
                      `(deftest ~test-sym
                         ;; only attempt to execute with the current PS
                         ;; shell.
                         (with-redefs [classpath/powershell-exec-path #(fs/which ~ps)])
-                        ~body)))))))))
+                        ~body)
+
+                     `(deftest ~test-sym
+                        (testing ~(str "skipped - " exec " not found with " ps)
+                          (is true))))
+
+                   `(deftest ~test-sym
+                      (testing ~(str "skipped - " ps " not in path")
+                        (is true))))))))))
 
 
 (deftest-if-exec-use-PowerShell-on-windows
   lein
 
-  (testing "scan project"
+  (testing "scan lein project"
     (fs/with-temp-dir
       [temp-dir]
       (let [project (.toString (fs/path temp-dir "project.clj"))
@@ -120,7 +127,7 @@
 (deftest-if-exec-use-PowerShell-on-windows
   clojure
 
-  (testing "scan project"
+  (testing "scan clojure project"
     (fs/with-temp-dir
       [temp-dir]
       (let [project (.toString (fs/path temp-dir "deps.edn"))
@@ -133,7 +140,7 @@
 (deftest-if-exec
   boot
 
-  (testing "scan project"
+  (testing "scan boot project"
     (fs/with-temp-dir
       [temp-dir]
       (let [project (.toString (fs/path temp-dir "build.boot"))
@@ -146,7 +153,7 @@
 (deftest-if-exec
   npx
 
-  (testing "shadow-cljs scan project"
+  (testing "scan shadow-cljs project"
     (fs/with-temp-dir
       [temp-dir]
       (let [project (.toString (fs/path temp-dir "shadow-cljs.edn"))
@@ -159,7 +166,7 @@
 (deftest-if-exec
   bb
 
-  (testing "babashka scan project"
+  (testing "scan babashka project"
     (fs/with-temp-dir
       [temp-dir]
       (let [project (.toString (fs/path temp-dir "bb.edn"))
