@@ -24,7 +24,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        #os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [windows-latest]
     steps:
       - uses: actions/checkout@v2.2.0
         with:
@@ -70,12 +71,12 @@ jobs:
       - name: Run cross platform tests
         shell: powershell
         run: |
-          Get-Command clojure
+          Get-Command
           cd lib
           clojure -M:test --focus clojure-lsp.classpath-test
 
       - name: Run cross platform tests pwsh
         run: |
-          Get-Command clojure
+          Get-Command
           cd lib
           clojure -M:test --focus clojure-lsp.classpath-test
