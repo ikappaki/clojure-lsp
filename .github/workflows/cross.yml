@@ -1,4 +1,4 @@
-name: cross platform tests
+name: cross platform ci
 
 on:
   push:
@@ -19,13 +19,12 @@ on:
   pull_request:
 
 jobs:
-  unit-test:
+  cross-platform:
     runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-        # os: [windows-latest]
     steps:
       - uses: actions/checkout@v2.2.0
         with:
@@ -65,10 +64,18 @@ jobs:
           echo $env:BOOT_BIN_DIR | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           # workaround for finding the JDK
           reg add "HKLM\SOFTWARE\JavaSoft\Java Development Kit\1.8" /v JAVAHome /d "$env:JAVA_HOME" /f
-          # boot strap
+          # bootstrap
           & "$env:BOOT_BIN_DIR/boot.exe" -V
 
       - name: Run cross platform tests
+        shell: powershell
         run: |
+          Get-Command clojure
+          cd lib
+          clojure -M:test --focus clojure-lsp.classpath-test
+
+      - name: Run cross platform tests pwsh
+        run: |
+          Get-Command clojure
           cd lib
           clojure -M:test --focus clojure-lsp.classpath-test
