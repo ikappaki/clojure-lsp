@@ -49,21 +49,18 @@
               :classpath-cmd ["bb" "print-deps" "--format" "classpath"]}]
             (classpath/default-project-specs #{:something :otherthing}))))))
 
-(defmacro in-ci-env
-  "Return whether the tests are executed in a continuous integrated
-  environment."
+(defmacro never-skip-exec-tests
+  "Return whether executable tests should never been skipped."
   []
-  (System/getenv "GITHUB_ACTION"))
+  (System/getenv "CLOJURE_LSP_EXEC_TESTS_NEVER_SKIP"))
 
 (defmacro deftest-if-exec
   "If EXEC is in path, run BODY as `(deftest \"EXEC\" BODY)`, otherwise
-  create an empty `deftest` with a skip message.
-
-  Never skip if running in a continuous integrated enviornment."
+  create an empty `deftest` with a skip message"
   [exec body]
 
   (let [exec-str (str exec)]
-    (if (or (in-ci-env) (fs/which exec-str))
+    (if (or (never-skip-exec-tests) (fs/which exec-str))
       `(deftest ~exec
          ~body)
 
@@ -76,9 +73,7 @@
   otherwise create an empty `deftest` with a skip message.
 
   When running on MS-Windows, try to invoke witha all PowerShell
-  shells.
-
-  Never skip if running in a continuous integrated enviornment."
+  shells."
   [exec body]
 
   (if-not shared/windows-os?
@@ -87,13 +82,13 @@
        ~body)
 
     (let [exec-str (str exec)
-          in-ci-env? (in-ci-env)]
+          never-skip-exec-tests? (never-skip-exec-tests)]
       (apply list 'do
              ;; use any of the known PowerShell shells.
              (for [ps ["powershell" "pwsh"]]
                (let [test-sym (symbol (str "windows-" ps "-" exec))]
-                 (if (or in-ci-env? (fs/which ps))
-                   (if (or in-ci-env?
+                 (if (or never-skip-exec-tests? (fs/which ps))
+                   (if (or never-skip-exec-tests?
                            (= 0 (:exit (shell/sh ps "-NoProfile" "-Command" "Get-Command" exec-str))))
                      `(deftest ~test-sym
                         ;; only attempt to execute with the current PS

@@ -45,6 +45,8 @@ jobs:
           bb: 0.8.157
           boot: 2.8.3
       - name: Run x-tests
+        env:
+          CLOJURE_LSP_EXEC_TESTS_NEVER_SKIP: true
         run: |
           cd lib
           clojure -M:test --focus clojure-lsp.classpath-test
