@@ -86,12 +86,6 @@
                 paths))
          (reduce set/union))))
 
-(defn ^:private classpath-cmd->windows-safe-classpath-cmd
-  [classpath]
-  (if shared/windows-os?
-    (into ["pwsh" "-NoProfile" "-Command"] classpath)
-    classpath))
-
 (defn ^:private powershell-exec-path
   "Return the local path to a PowerShell executable shell file.
 
