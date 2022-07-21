@@ -1952,6 +1952,7 @@
 <li>
 <p>Editor</p>
 </li>
+<li>Add clojure.core/fn to resolve-macro-as options. <a href="https://github.com/clojure-lsp/clojure-lsp/issues/1094">#1094</a></li>
 <li>Restore #995 Improve element selected on <code>textDocument/hover</code> (previously reverted) with a fix that keeps it working for Calva even after a syntax error is introduced.</li>
 <li>Improve call hierarchy performance by parsing less frequently. #1092</li>
 <li>Improve system wide performance by keeping a graph of dependencies between namespaces. #990 #1053
@@ -1963,6 +1964,7 @@
 <li>Fix to update unused-public-var lint on registered keywords as usages change in other files. #1018</li>
 <li>Fix to navigate to var defined by declare, when there aren't any later defs. #1107</li>
 <li>Fix to always go to the definition of the correct var imported by potemkin. #1020</li>
+<li>Fix to correctly rename namespaces. #1121</li>
 </ul>
 <h2 id="20220629-193213">2022.06.29-19.32.13<a class="headerlink" href="#20220629-193213" title="Permanent link">#</a></h2>
 <ul>
@@ -3040,7 +3042,7 @@ when multiple files are changed at same time (rename, iedit, etc).</li>
 <div class="md-source-date">
   <small>
     
-      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 10, 2022</span>
+      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 21, 2022</span>
     
   </small>
 </div>
