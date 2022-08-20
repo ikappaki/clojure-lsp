@@ -8,13 +8,6 @@
    [clojure.java.shell :as shell]
    [clojure.test :refer [deftest is testing]]))
 
-(defn locate-executable-mock [responses]
-  (fn [project-exec]
-    (some (fn [[exec response]]
-                 (when (= project-exec exec)
-                   response))
-          responses)))
-
 (deftest default-project-specs-test
   (with-redefs [shared/windows-os? false
                 classpath/locate-executable identity]
@@ -69,6 +62,15 @@ components reference to it."
                        (classpath/default-project-specs #{})}}]
     (spit project "")
     {:db* (atom db)}))
+
+(comment
+  (let [db {:project-root-uri (-> (fs/path "d:/src/clojure-lsp") .toUri .toString)
+            :settings {:project-specs
+                       (classpath/default-project-specs #{})}}]
+    (classpath/scan-classpath! {:db* (atom db)}))
+
+;;
+  )
 
 (defn locate-executable-mock [responses]
   (fn [project-exec]
@@ -238,6 +240,28 @@ components reference to it."
 
         (let [components (make-components temp-dir "deps.edn")]
           (is (= #{"a" "c"} (classpath/scan-classpath! components)))))))
+
+
+  ;; test with multiple project files present
+  (testing "clojure & bb"
+    (fs/with-temp-dir
+      [temp-dir]
+      (with-redefs [shared/windows-os? false
+
+                    classpath/locate-executable (locate-executable-mock {"bb" "pathto/bb.xyz"
+                                                                         "clojure" "pathto/clojure.xyz"})
+
+                    classpath/shell
+                    (shell-mock {["pathto/bb.xyz" "print-deps" "--format" "classpath" :dir (.toString temp-dir)]
+                                 (str/join fs/path-separator ["a" "b"])
+
+                                 ["pathto/clojure.xyz" "-Spath" :dir (.toString temp-dir)]
+                                 (str/join fs/path-separator ["a" "c"])})]
+
+        (let [components (make-components temp-dir "deps.edn")
+              bb (.toString (fs/path temp-dir "bb.edn"))]
+          (spit bb "")
+          (is (= #{"a" "b" "c"} (classpath/scan-classpath! components)))))))
 
   (testing "lein"
     (fs/with-temp-dir

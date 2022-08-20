@@ -2,8 +2,8 @@ name: Release
 
 on:
   push:
-    tags:
-      - 2*
+    # tags:
+    #   - 2*
 
 jobs:
   build-lib-jar:
