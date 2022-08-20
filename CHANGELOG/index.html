@@ -502,6 +502,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#20220724-182543" class="md-nav__link">
+    2022.07.24-18.25.43
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#20220629-193213" class="md-nav__link">
     2022.06.29-19.32.13
   </a>
@@ -1233,6 +1240,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#20220724-182543" class="md-nav__link">
+    2022.07.24-18.25.43
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#20220629-193213" class="md-nav__link">
     2022.06.29-19.32.13
   </a>
@@ -1946,6 +1960,34 @@
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">#</a></h2>
 <ul>
 <li>General</li>
+<li>Remove dependency on lsp4j. https://github.com/clojure-lsp/lsp4clj/issues/8</li>
+<li>Fix extra space on :import when sorting classes. #1152</li>
+<li>Bump Graalvm from 22.0.0.2 to 22.2.0 improving binary performance/size. #1154</li>
+<li>Bump clj-kondo to <code>2022.08.03</code>.</li>
+<li>General release of dep-graph-queries, improving query performance. See prior release for feature details.</li>
+<li>Generate nightly builds for macos aarch64 (M1/M2) every push on master.</li>
+<li>
+<p>Bump lsp4clj to <code>1.1.0</code>.</p>
+</li>
+<li>
+<p>Editor</p>
+</li>
+<li>Improve completion sorting, showing locals before functions and other completion items. #1158</li>
+<li>Fix hover to show current var definition docs instead of <code>def</code>/<code>defn</code>. #1157</li>
+<li>Improve hover for requires to show ns docstring. #1171</li>
+<li>Fix destructuring of things that have been destructured before. #1156</li>
+<li>Some completions require that a new alias be added to the ns form. Fix this feature for Calva users, and improve performance for all users. #1068</li>
+<li>Fix resolve-macro-as code action corner case. #1084</li>
+<li>Ensure line numbers provided by document-symbol correspond to the latest version of the file. #1178</li>
+<li>Avoid exceptions when clients use URIs that don't exist on disk.</li>
+<li>Fix documentation on completion items. #1181</li>
+<li>Fix rename of defrecords. #1165</li>
+<li>Fix to send all diagnostics to client at startup, even in very large projects. #1153</li>
+<li>Fix to preserve kebab-casing in server-info-raw. #1195</li>
+</ul>
+<h2 id="20220724-182543">2022.07.24-18.25.43<a class="headerlink" href="#20220724-182543" title="Permanent link">#</a></h2>
+<ul>
+<li>General</li>
 <li>
 <p>Bump <code>cljfmt</code> from 0.8.0 -&gt; 0.8.2</p>
 </li>
@@ -1965,6 +2007,11 @@
 <li>Fix to navigate to var defined by declare, when there aren't any later defs. #1107</li>
 <li>Fix to always go to the definition of the correct var imported by potemkin. #1020</li>
 <li>Fix to correctly rename namespaces. #1121</li>
+<li>Fix to correctly :keep require and import indent spacing. #1141</li>
+<li>Improve accuracy of progress reporting during uncached startup. #1134</li>
+<li>Add refactoring <code>Destructure keys</code> to destructure keywords. #905</li>
+<li>Add refactoring <code>Extract to def</code> to create a <code>def</code> from the thing under the cursor. #1136</li>
+<li>Include defmethods in document and workspace symbols. #1016</li>
 </ul>
 <h2 id="20220629-193213">2022.06.29-19.32.13<a class="headerlink" href="#20220629-193213" title="Permanent link">#</a></h2>
 <ul>
@@ -2111,11 +2158,11 @@
 <h2 id="20220331-200020">2022.03.31-20.00.20<a class="headerlink" href="#20220331-200020" title="Permanent link">#</a></h2>
 <ul>
 <li>Fix URI resolver on java JDK logic.</li>
-<li>Fix zipfile scheme when finding external deps. </li>
+<li>Fix zipfile scheme when finding external deps.</li>
 </ul>
 <h2 id="20220331-142114">2022.03.31-14.21.14<a class="headerlink" href="#20220331-142114" title="Permanent link">#</a></h2>
 <ul>
-<li>Add java class find-definition support, decompiling .class files when available. #762 </li>
+<li>Add java class find-definition support, decompiling .class files when available. #762</li>
 <li>Add JDK source discoverability feature, searching for installed JDK for later analyze with clj-kondo and support java classes interop.</li>
 <li>Add <code>:java :download-jdk-source?</code> setting to download JDK source after startup if not cached before globally or found locally. Disabled by default.</li>
 <li>Avoid high CPU usage and freezes by more efficiently finding referenced files to notify on file change. #844 @mainej</li>
@@ -3042,7 +3089,7 @@ when multiple files are changed at same time (rename, iedit, etc).</li>
 <div class="md-source-date">
   <small>
     
-      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 21, 2022</span>
+      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">August 20, 2022</span>
     
   </small>
 </div>

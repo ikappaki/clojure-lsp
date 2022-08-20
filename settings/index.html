@@ -1174,6 +1174,11 @@
 <td><code>true</code></td>
 </tr>
 <tr>
+<td><code>:completion</code> <code>:additional-edits-warning-text</code></td>
+<td>A warning to show when the completion will perform additional edits, such as requiring a new alias. Appears in the completion items' documentation.</td>
+<td><code>nil</code></td>
+</tr>
+<tr>
 <td><code>:copy-kondo-configs?</code></td>
 <td>Whether to copy clj-kondo hooks configs exported by libs on classpath during startup lint.</td>
 <td><code>true</code></td>
@@ -1195,8 +1200,8 @@
 </tr>
 <tr>
 <td><code>:experimental</code> <code>:dep-graph-queries</code></td>
-<td>If true, use the dep-graph to improve performance of many things that use the clj-kondo analysis.</td>
-<td><code>false</code></td>
+<td>If false, do not use the dep-graph for queries. (This setting is scheduled for removal in the next release.)</td>
+<td><code>true</code></td>
 </tr>
 <tr>
 <td><code>:hover</code> <code>:arity-on-same-line?</code></td>
@@ -1508,7 +1513,7 @@ The available settings inside <code>:stubs</code> are:</p>
 <div class="md-source-date">
   <small>
     
-      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 19, 2022</span>
+      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">August 18, 2022</span>
     
   </small>
 </div>
