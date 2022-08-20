@@ -134,8 +134,6 @@
                 paths))
          (reduce set/union))))
 
-
-
 (defn ^:private lein-source-aliases [source-aliases]
   (some->> source-aliases
            (map #(str "+" (name %)))
