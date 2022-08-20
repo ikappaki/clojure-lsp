@@ -50,14 +50,113 @@
        flatten
        (reduce str)))
 
+(defn psh-cmd
+  ([psh & args]
+   (into [psh "-NoProfile" "-Command"] args)))
+
+(comment
+  (psh-cmd "xyz")
+  )
+
+(defn locate-executable [exec]
+  (some-> ^java.nio.file.Path (fs/which exec) .toString))
+
+(defn shell [& args]
+  (apply shell/sh args))
+
+#_(defn exec-normalize [exec]
+  (if-not shared/windows-os?
+    (or (locate-executable exec) exec)
+
+    (cond
+      (#{"clojure" "lein"} exec)
+      (or (some #(when-let [ps (locate-executable %)]
+                   (when (= 0 (:exit (apply shell (psh-cmd ps "Get-Command" exec))))
+                     (psh-cmd ps exec)))
+                ["powershell" "pwsh"])
+          exec)
+      :else
+      (or (locate-executable exec) exec))))
+
+;; (defn ^:private powershell-exec-path
+;;   "Return the local path to a PowerShell executable shell file.
+
+;;   Look up order is:
+
+;;   pwsh - the name of the executable in PowerShell v6 or later.
+;;   powershell - the name of the executable prior to v6."
+;;   []
+;;   (or (fs/which "pwsh")
+;;       (fs/which "powershell")))
+
+(defn ^:private classpath-cmd->normalize
+  "Return CLASSPATH-CMD. If running on MS-Windows, update it to be invokable from windows.
+
+  It uses `powershell-exec-path` to locate the PowerShell exec file
+  for invoking the Clojure cli script on MS-Windows."
+  [[exec & args :as classpath-cmd]]
+  (if (and shared/windows-os?
+           (#{"clojure" "lein"} exec)
+           (not (locate-executable exec)))
+    (if-let [up (some #(when-let [ps (locate-executable %)]
+                         (when (= 0 (:exit (apply shell (psh-cmd ps "Get-Command" exec))))
+                           (psh-cmd ps exec)))
+                      ["powershell" "pwsh"])]
+      (into up args)
+
+      classpath-cmd)
+
+    (or (some->> (locate-executable exec)
+                 (assoc classpath-cmd 0))
+        classpath-cmd)
+
+    #_(if-not shared/windows-os?
+        (or (some->> (exec-path exec)
+                     (assoc classpath-cmd 0))
+            classpath-cmd)
+
+        (cond
+          (#{"clojure" "lein"} exec)
+          (if-let [up (some #(when-let [ps (exec-path %)]
+                               (when (= 0 (:exit (apply shell (psh-cmd ps "Get-Command" exec))))
+                                 (psh-cmd ps exec)))
+                            ["powershell" "pwsh"])]
+            (concat up args)
+
+            classpath-cmd)
+          :else
+          (or (some->> (exec-path exec)
+                       (assoc classpath-cmd 0))
+              classpath-cmd))))
+
+  ;;(update classpath-cmd 0 exec-normalize)
+  ;; (if shared/windows-os?
+  ;;   (let [cmd (first classpath-cmd)]
+  ;;     (cond
+  ;;       (#{"clojure" "lein"} cmd)
+  ;;       ;; The Clojure cli tools command is a PowerShell script.
+  ;;       ;;
+  ;;       ;; The Leiningen command can be a .cmd, .bat or .ps1 file. Use
+  ;;       ;; PowerShell as a catch all invoker.
+  ;;       (if-let [psh (powershell-exec-path)]
+  ;;         (into [(fs/file-name psh) "-NoProfile" "-Command"] classpath-cmd)
+  ;;         classpath-cmd)
+
+  ;;       :else
+  ;;       ;; Update executable with file extension so that can be
+  ;;       ;; invoked by the shell/sh command.
+  ;;       (update classpath-cmd 0 #(or (some-> (fs/which %1) fs/file-name) %1))))
+  ;;   classpath-cmd)
+  )
+
 (defn ^:private lookup-classpath! [root-path {:keys [classpath-cmd env]}]
   (let [command (string/join " " classpath-cmd)]
     (logger/info (format "Finding classpath via `%s`" command))
     (try
       (let [sep (re-pattern (System/getProperty "path.separator"))
-            {:keys [exit out err]} (apply shell/sh (into classpath-cmd
-                                                         (cond-> [:dir (str root-path)]
-                                                           env (conj :env (merge {} (System/getenv) env)))))]
+            {:keys [exit out err]} (apply shell (into classpath-cmd
+                                                      (cond-> [:dir (str root-path)]
+                                                        env (conj :env (merge {} (System/getenv) env)))))]
         (if (= 0 exit)
           (let [paths (-> out
                           string/split-lines
@@ -86,40 +185,7 @@
                 paths))
          (reduce set/union))))
 
-(defn ^:private powershell-exec-path
-  "Return the local path to a PowerShell executable shell file.
 
-  Look up order is:
-
-  pwsh - the name of the executable in PowerShell v6 or later.
-  powershell - the name of the executable prior to v6."
-  []
-  (or (fs/which "pwsh")
-      (fs/which "powershell")))
-
-(defn ^:private classpath-cmd->windows-compatible
-  "Return CLASSPATH-CMD. If running on MS-Windows, update it to be invokable from windows.
-
-  It uses `powershell-exec-path` to locate the PowerShell exec file
-  for invoking the Clojure cli script on MS-Windows."
-  [classpath-cmd]
-  (if shared/windows-os?
-    (let [cmd (first classpath-cmd)]
-      (cond
-        (#{"clojure" "lein"} cmd)
-        ;; The Clojure cli tools command is a PowerShell script.
-        ;;
-        ;; The Leiningen command can be a .cmd, .bat or .ps1 file. Use
-        ;; PowerShell as a catch all invoker.
-        (if-let [psh (powershell-exec-path)]
-          (into [(fs/file-name psh) "-NoProfile" "-Command"] classpath-cmd)
-          classpath-cmd)
-
-        :else
-        ;; Update executable with file extension so that can be
-        ;; invoked by the shell/sh command.
-        (update classpath-cmd 0 #(or (some-> (fs/which %1) fs/file-name) %1))))
-    classpath-cmd))
 
 (defn ^:private lein-source-aliases [source-aliases]
   (some->> source-aliases
@@ -153,4 +219,4 @@
          :classpath-cmd ["npx" "shadow-cljs" "classpath"]}
         {:project-path "bb.edn"
          :classpath-cmd ["bb" "print-deps" "--format" "classpath"]}]
-       (map #(update % :classpath-cmd classpath-cmd->windows-compatible))))
+       (map #(update % :classpath-cmd classpath-cmd->normalize))))
