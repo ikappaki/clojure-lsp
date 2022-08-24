@@ -59,7 +59,9 @@
 (defn ^:private locate-executable
   "Locate and return the full path to the EXECUTABLE."
   [executable]
-  (some-> ^java.nio.file.Path (fs/which executable) .toString))
+  (let [found (some-> ^java.nio.file.Path (fs/which executable) .toString)]
+    (logger/info (format ":loc :exec `%s` :found `%s`" executable found))
+    found))
 
 (defn ^:private shell
   "Execute CMD-AND-ARGS with `clojure.java.shell/sh`, of which see."
