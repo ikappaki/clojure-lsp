@@ -5,7 +5,7 @@ on:
     # tags:
     #   - 2*
 
-# jobs:
+jobs:
 #   build-lib-jar:
 #     # if: startsWith(github.ref, 'refs/tags/2')
 #     name: Build JVM lib
@@ -322,7 +322,7 @@ on:
 
   windows:
     name: Build native Windows binary
-    needs: [build-lib-jar, build-cli-jar]
+    # needs: [build-lib-jar, build-cli-jar]
     runs-on: windows-2022
     steps:
       # - uses: actions/checkout@v2
