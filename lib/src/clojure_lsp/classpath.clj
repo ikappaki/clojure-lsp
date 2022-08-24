@@ -66,7 +66,9 @@
 (defn ^:private shell
   "Execute CMD-AND-ARGS with `clojure.java.shell/sh`, of which see."
   [& cmd-and-args]
-  (apply shell/sh cmd-and-args))
+  (let [ret (apply shell/sh cmd-and-args)]
+    (logger/info (format ":shell :cmd `%s` :ret `%s`" cmd-and-args ret))
+    ret))
 
 (defn ^:private classpath-cmd->normalize
   "Return CLASSPATH-CMD, but with the EXEC expanded to its full path (if found).

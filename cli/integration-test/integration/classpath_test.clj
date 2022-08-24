@@ -23,32 +23,32 @@
   (let [{:keys [classpath] :as _res} (lsp/request! ["clojure/serverInfo/raw" {}])]
     (is (some #(str/includes? % "datomic-free") classpath))))
 
-;; (deftest claspath-boot
-;;   (lsp/start-process!)
-;;   (lsp/request! [:initialize {:rootUri (getRootUri "sample-test-boot")
-;;                               :initializationOptions fixture/default-init-options}])
-;;   (let [{:keys [classpath] :as _res} (lsp/request! ["clojure/serverInfo/raw" {}])]
-;;     (is (some #(str/includes? % "datomic-free") classpath))))
+(deftest claspath-boot
+  (lsp/start-process!)
+  (lsp/request! [:initialize {:rootUri (getRootUri "sample-test-boot")
+                              :initializationOptions fixture/default-init-options}])
+  (let [{:keys [classpath] :as _res} (lsp/request! ["clojure/serverInfo/raw" {}])]
+    (is (some #(str/includes? % "datomic-free") classpath))))
 
-;; (deftest claspath-cli
-;;   (lsp/start-process!)
-;;   (lsp/request! (fixture/initialize-request
-;;                  {:initializationOptions fixture/default-init-options}))
-;;   (let [{:keys [classpath] :as _res} (lsp/request! ["clojure/serverInfo/raw" {}])]
-;;     (is (some #(str/includes? % "datomic-free") classpath))))
-
-
-;; (deftest claspath-lein
-;;   (lsp/start-process!)
-;;   (lsp/request! [:initialize {:rootUri (getRootUri "sample-test-lein")
-;;                               :initializationOptions fixture/default-init-options}])
-;;   (let [{:keys [classpath] :as _res} (lsp/request! ["clojure/serverInfo/raw" {}])]
-;;     (is (some #(str/includes? % "datomic-free") classpath))))
+(deftest claspath-cli
+  (lsp/start-process!)
+  (lsp/request! (fixture/initialize-request
+                 {:initializationOptions fixture/default-init-options}))
+  (let [{:keys [classpath] :as _res} (lsp/request! ["clojure/serverInfo/raw" {}])]
+    (is (some #(str/includes? % "datomic-free") classpath))))
 
 
-;; (deftest claspath-shadow
-;;   (lsp/start-process!)
-;;   (lsp/request! [:initialize {:rootUri  (getRootUri "sample-test-shadow")
-;;                               :initializationOptions fixture/default-init-options}])
-;;   (let [{:keys [classpath] :as _res} (lsp/request! ["clojure/serverInfo/raw" {}])]
-;;     (is (some #(str/includes? % "datomic-free") classpath))))
+(deftest claspath-lein
+  (lsp/start-process!)
+  (lsp/request! [:initialize {:rootUri (getRootUri "sample-test-lein")
+                              :initializationOptions fixture/default-init-options}])
+  (let [{:keys [classpath] :as _res} (lsp/request! ["clojure/serverInfo/raw" {}])]
+    (is (some #(str/includes? % "datomic-free") classpath))))
+
+
+(deftest claspath-shadow
+  (lsp/start-process!)
+  (lsp/request! [:initialize {:rootUri  (getRootUri "sample-test-shadow")
+                              :initializationOptions fixture/default-init-options}])
+  (let [{:keys [classpath] :as _res} (lsp/request! ["clojure/serverInfo/raw" {}])]
+    (is (some #(str/includes? % "datomic-free") classpath))))
