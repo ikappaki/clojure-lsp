@@ -351,12 +351,9 @@ jobs:
 
       - name: test
         run: |
+          powershell -NoProfile -Command clojure --version
           Get-Command bb
-          Get-Command clojure
-          Get-Command lein
-          Get-Command boot
-          Get-Command npx          
-          
+          bb -e '(babashka.fs/which \"bb\")'
 
       # - name: Install MSVC
       #   uses: ilammy/msvc-dev-cmd@v1
