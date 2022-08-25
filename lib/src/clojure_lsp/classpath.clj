@@ -11,6 +11,9 @@
    [clojure.set :as set]
    [clojure.string :as string])
   (:import
+   [java.io File]
+   [java.net URI]
+   (java.nio.file Path)
    (java.io ByteArrayOutputStream)
    (java.security MessageDigest)))
 
