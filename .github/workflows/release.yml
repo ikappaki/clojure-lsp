@@ -100,17 +100,21 @@ jobs:
         with:
           cli: '1.10.3.1013'
 
-      - name: Install make
-        uses: crazy-max/ghaction-chocolatey@v1
-        with:
-          args: install make
+      # - name: Install make
+      #   uses: crazy-max/ghaction-chocolatey@v1
+      #   with:
+      #     args: install make
 
       - name: Get latest tag
         id: latest-tag
         uses: WyriHaximus/github-action-get-previous-tag@v1
 
       - name: Generate jar for native
-        run: make cli-jar-for-native
+        run: |
+          cd cli
+          clojure -T:build prod-jar-for-native
+          mv target/clojure-lsp-standalone.jar ..
+          # make cli-jar-for-native
 
       - name: Upload jar
         uses: actions/upload-artifact@v2
@@ -118,14 +122,19 @@ jobs:
           path: clojure-lsp-standalone.jar
           name: clojure-lsp-standalone.jar
 
-      - name: Generate cli bin
-        run: make prod-cli
+      # - name: Generate cli bin
+      #   run: |
+      #     cd cli
+      #     clojure -T:build prod-cli
+      #     mv clojure-lsp.exe ..
 
-      - name: Upload bin
-        uses: actions/upload-artifact@v2
-        with:
-          path: clojure-lsp
-          name: clojure-lsp
+        # run: make prod-cli
+
+      # - name: Upload bin
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     path: clojure-lsp
+      #     name: clojure-lsp
 
   # linux-amd64:
   #   name: Build native linux amd64 binary
