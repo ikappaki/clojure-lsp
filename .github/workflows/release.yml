@@ -37,10 +37,55 @@ jobs:
           path: clojure-lsp.jar
           name: clojure-lsp.jar
 
-  build-cli-jar:
+  # build-cli-jar:
+  #   # if: startsWith(github.ref, 'refs/tags/2')
+  #   name: Build JVM cli
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2.2.0
+  #       with:
+  #         fetch-depth: 0
+  #     - name: Prepare java
+  #       uses: actions/setup-java@v1
+  #       with:
+  #         java-version: 11
+
+  #     - name: Install Clojure
+  #       uses: DeLaGuardo/setup-clojure@master
+  #       with:
+  #         cli: '1.10.3.1013'
+
+  #     - name: Get latest tag
+  #       id: latest-tag
+  #       uses: WyriHaximus/github-action-get-previous-tag@v1
+
+  #     - name: Install make
+  #       uses: crazy-max/ghaction-chocolatey@v1
+  #       with:
+  #         args: install make
+
+  #     - name: Generate jar for native
+  #       run: make cli-jar-for-native
+
+  #     - name: Upload jar
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         path: clojure-lsp-standalone.jar
+  #         name: clojure-lsp-standalone.jar
+
+  #     - name: Generate cli bin
+  #       run: make prod-cli
+
+  #     - name: Upload bin
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         path: clojure-lsp
+  #         name: clojure-lsp
+
+  build-cli-jar-win:
     # if: startsWith(github.ref, 'refs/tags/2')
     name: Build JVM cli
-    runs-on: ubuntu-latest
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2.2.0
         with:
@@ -322,7 +367,7 @@ jobs:
 
   windows:
     name: Build native Windows binary
-    needs: [build-lib-jar, build-cli-jar]
+    needs: [build-lib-jar, build-cli-jar-win]
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2

@@ -59,18 +59,80 @@
   ([psh & cmd-and-args]
    (into [psh "-NoProfile" "-Command"] cmd-and-args)))
 
+;; (defn- as-path
+;;   ^Path [path]
+;;   (if (instance? Path path) path
+;;       (if (instance? URI path)
+;;         (java.nio.file.Paths/get ^URI path)
+;;         (.toPath (io/file path)))))
+
+;; (defn- filename-only?
+;;   "Returns true if `f` is exactly a file name (i.e. with no absolute or
+;;   relative path information."
+;;   [f]
+;;   (let [^:Path f-as-path (as-path f)]
+;;     (= f-as-path (.getFileName f-as-path))))
+
+
+;; (def ^:private win?
+;;   (-> (System/getProperty "os.name")
+;;       (string/lower-case)
+;;       (string/includes? "win")))
+
+;; (defn locate-executable2
+;;   [program]
+;;   (logger/info (format ":le `%s`" program))
+;;   (let [opts nil
+;;         exts (if win?
+;;                (let [exts (or (:win-exts opts)
+;;                               ["com" "exe" "bat" "cmd"])
+;;                      ext (fs/extension program)]
+;;                  (if (and ext (contains? (set exts) ext))
+;;                     ;; this program name already contains the expected extension so we
+;;                     ;; first search with that and then try the others to find e.g. foo.bat.cmd
+;;                    (into [nil] exts)
+;;                    exts))
+;;                [nil])
+;;          ;; if program is exactly a file name, then search all the path entries
+;;          ;; otherwise, only search relative to current directory (absolute paths will throw)
+;;         candidate-paths (if (filename-only? program)
+;;                           (babashka.fs/exec-paths)
+;;                           [nil])]
+;;     (loop [paths candidate-paths
+;;            results []]
+;;       (if (seq paths)
+;;         (let [p (first paths)
+;;               fs (loop [exts exts
+;;                         candidates []]
+;;                    (if (seq exts)
+;;                      (let [ext (first exts)
+;;                            f (babashka.fs/path p (str program (when ext (str "." ext))))]
+;;                        ;; (logger/info (format ":le :ext `%s`" f))
+;;                        (if (and (fs/executable? f) (not (fs/directory? f)))
+;;                          (recur (rest exts)
+;;                                 (conj candidates f))
+;;                          (recur (rest exts)
+;;                                 candidates)))
+;;                      candidates))]
+;;           (if (seq fs)
+;;             (if (:all opts)
+;;               (recur (rest paths) (into results fs))
+;;               (first fs))
+;;             (recur (rest paths) results)))
+;;         (if (:all opts) results (first results))))))
+
 (defn ^:private locate-executable
   "Locate and return the full path to the EXECUTABLE."
   [executable]
   (let [found (some-> ^java.nio.file.Path (fs/which executable) .toString)]
-    (logger/info (format ":loc :exec `%s` :found `%s`" executable found))
+    ;; (logger/info (format ":loc :exec `%s` :found `%s`" executable found))
     found))
 
 (defn ^:private shell
   "Execute CMD-AND-ARGS with `clojure.java.shell/sh`, of which see."
   [& cmd-and-args]
   (let [ret (apply shell/sh cmd-and-args)]
-    (logger/info (format ":shell :cmd `%s` :ret `%s`" cmd-and-args ret))
+    ;; (logger/info (format ":shell :cmd `%s` :ret `%s`" cmd-and-args ret))
     ret))
 
 (defn ^:private classpath-cmd->normalize
@@ -157,10 +219,9 @@
            vector))
 
 (defn default-project-specs [source-aliases]
-  (logger/info (format ":specs :path `%s`" (System/getenv)))
+  ;; (logger/info (format ":specs :path `%s`" (System/getenv)))
   (logger/info (format ":path-separator `%s` :fps `%s`"  fs/path-separator File/pathSeparator))
-  (logger/info (format ":exec-paths `%s`" (fs/exec-paths)))
-  (logger/info (format ":exec-paths `%s`" (fs/exec-paths)))
+  ;; (logger/info (format ":exec-paths `%s`" (fs/exec-paths)))
 
   (->> [{:project-path "project.clj"
          :classpath-cmd (->> ["lein" (lein-source-aliases source-aliases) "classpath"]
