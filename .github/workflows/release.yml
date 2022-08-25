@@ -355,7 +355,7 @@ jobs:
       - name: Install GraalVM
         uses: DeLaGuardo/setup-graalvm@master
         with:
-          graalvm: 22.2.0
+          graalvm: 21.3.0
           java: java11
 
       - name: Install native-image component
@@ -367,25 +367,15 @@ jobs:
         with:
           args: install make
 
-      - name: Build Windows2 native image
+      - name: Build Windows native image
         env:
-          CLOJURE_LSP_JAR: "../clojure-lsp-standalone.jar"
+          CLOJURE_LSP_JAR: ..\clojure-lsp-standalone.jar
           CLOJURE_LSP_XMX: "-J-Xmx7g"
         run: |
           cd cli
-          clojure -T:build native-cli
-          mv clojure-lsp.exe ..
-          # make native-cli
-
-      # - name: Build Windows native image
-      #   env:
-      #     CLOJURE_LSP_JAR: ..\clojure-lsp-standalone.jar
-      #     CLOJURE_LSP_XMX: "-J-Xmx7g"
-      #   run: |
-      #     cd cli
-      #     .\graalvm\native-windows-compile.bat
-      #     mv clojure-lsp.exe ..\
-      #     cd ..\
+          .\graalvm\native-windows-compile.bat
+          mv clojure-lsp.exe ..\
+          cd ..\
 
       - name: Compress binary
         uses: svenstaro/upx-action@v2
