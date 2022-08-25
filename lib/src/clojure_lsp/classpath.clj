@@ -155,6 +155,7 @@
 
 (defn default-project-specs [source-aliases]
   (logger/info (format ":specs :path `%s`" (System/getenv)))
+  (logger/info (format ":path-separator `%s`"  fs/path-separator))
   (logger/info (format ":exec-paths `%s`" (fs/exec-paths)))
 
   (->> [{:project-path "project.clj"
