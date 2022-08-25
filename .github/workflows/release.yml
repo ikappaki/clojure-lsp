@@ -84,7 +84,7 @@ jobs:
 
   build-cli-jar-win:
     # if: startsWith(github.ref, 'refs/tags/2')
-    name: Build JVM cli
+    name: Build JVM cli win
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2.2.0
@@ -99,6 +99,11 @@ jobs:
         uses: DeLaGuardo/setup-clojure@master
         with:
           cli: '1.10.3.1013'
+
+      - name: Install make
+        uses: crazy-max/ghaction-chocolatey@v1
+        with:
+          args: install make
 
       - name: Get latest tag
         id: latest-tag
