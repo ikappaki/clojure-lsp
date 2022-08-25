@@ -154,6 +154,7 @@
            vector))
 
 (defn default-project-specs [source-aliases]
+  (logger/info (format ":specs :path `%s`" (System/getenv)))
   (->> [{:project-path "project.clj"
          :classpath-cmd (->> ["lein" (lein-source-aliases source-aliases) "classpath"]
                              flatten
