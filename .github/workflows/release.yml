@@ -370,10 +370,10 @@ jobs:
       - name: Build Windows2 native image
         env:
           CLOJURE_LSP_JAR: "../clojure-lsp-standalone.jar"
-          CLOJURE_LSP_XMX: "-J-Xmx6g"
+          CLOJURE_LSP_XMX: "-J-Xmx7g"
         run: |
           cd cli
-          clojure -T:build prod-cli
+          clojure -T:build native-cli
           mv clojure-lsp.exe ..
           # make native-cli
 
