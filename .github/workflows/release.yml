@@ -418,6 +418,10 @@ jobs:
           graalvm: 21.3.0
           java: java11
 
+      - name: Get latest tag
+        id: latest-tag
+        uses: WyriHaximus/github-action-get-previous-tag@v1
+
       - name: Generate jar for native
         run: |
           cd cli
