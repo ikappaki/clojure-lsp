@@ -134,6 +134,7 @@ jobs:
 
       - name: Generate embedded binary
         run: |
+          dir c:\ProgramData\Chocolatey\bin
           cd cli
           clojure -T:build prod-cli
 
