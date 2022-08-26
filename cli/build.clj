@@ -85,14 +85,15 @@
 
 (defn ^:private bin [opts]
   (println "Generating bin...")
+
   (if (fs/windows?)
-    (if-let [l4j (or (some-> (System/getenv "LAUNCH4J_HOME") (fs/path "launch4j.exe")
+    (if-let [l4j (or (some-> (System/getenv "LAUNCH4J_HOME") (fs/path "launch4jc.exe")
                              (#(when (fs/executable? %) %)))
-                     (fs/which "launch4j.exe"))]
-      (let [jre (-> "../clojure-lsp-standalone.jar" fs/real-path .toString)
-            outfile (-> "../clojure-lsp.exe"  fs/real-path .toString)
+                     (fs/which "launch4jc.exe"))]
+      (let [jar (-> (fs/real-path uber-file) .toString)
+            outfile (-> "../clojure-lsp.exe"  fs/absolutize fs/path .toString)
             java-home (System/getenv "JAVA_HOME")]
-        (println :jre jre :out outfile :jh java-home)
+        (println :jre jar :out outfile :jh java-home)
         (fs/with-temp-dir
           [temp-dir]
           (println :l l4j)
@@ -100,15 +101,14 @@
               ;;"c:/temp/io.xml"
                 (-> (fs/path temp-dir "l4j.xml") .toString)]
             (println :path l4jxml)
-            (spit l4jxml (l4j-xml jre outfile java-home))
+            (spit l4jxml (l4j-xml jar outfile java-home))
             (println :out (slurp l4jxml))
-            (let [{:keys [exit] :as _proc} @(p/process ["c:/tools/launch4j/launch4j.exe"
+            (let [{:keys [exit] :as _proc} @(p/process [(.toString l4j)
                                                         l4jxml]
                                                        {:dir "."
                                                         :out :inherit
                                                         :err :inherit})]
-              (System/exit exit))))
-        )
+              (System/exit exit)))))
       ;; (println (pr-str (xml/parse "l4j.xml")))
 
       (throw (Exception. (str "Cannot find launch4j.exe in path. " (fs/exec-paths)))))
@@ -135,7 +135,7 @@
                    "-Dclojure.core.async.go-checking=true"]}))
 
 (defn prod-cli [opts]
-  (prod-jar opts)
+  ;; (prod-jar opts)
   (bin {}))
 
 (defn native-cli [opts]
