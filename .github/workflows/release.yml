@@ -82,59 +82,59 @@ jobs:
   #         path: clojure-lsp
   #         name: clojure-lsp
 
-  build-cli-jar-win:
-    # if: startsWith(github.ref, 'refs/tags/2')
-    name: Build JVM cli win
-    runs-on: windows-2022
-    steps:
-      - uses: actions/checkout@v2.2.0
-        with:
-          fetch-depth: 0
-      - name: Prepare java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
+  # build-cli-jar-win:
+  #   # if: startsWith(github.ref, 'refs/tags/2')
+  #   name: Build JVM cli win
+  #   runs-on: windows-2022
+  #   steps:
+  #     - uses: actions/checkout@v2.2.0
+  #       with:
+  #         fetch-depth: 0
+  #     - name: Prepare java
+  #       uses: actions/setup-java@v1
+  #       with:
+  #         java-version: 11
 
-      - name: Install Clojure
-        uses: DeLaGuardo/setup-clojure@master
-        with:
-          cli: '1.10.3.1013'
+  #     - name: Install Clojure
+  #       uses: DeLaGuardo/setup-clojure@master
+  #       with:
+  #         cli: '1.10.3.1013'
 
-      # - name: Install make
-      #   uses: crazy-max/ghaction-chocolatey@v1
-      #   with:
-      #     args: install make
+  #     # - name: Install make
+  #     #   uses: crazy-max/ghaction-chocolatey@v1
+  #     #   with:
+  #     #     args: install make
 
-      - name: Get latest tag
-        id: latest-tag
-        uses: WyriHaximus/github-action-get-previous-tag@v1
+  #     - name: Get latest tag
+  #       id: latest-tag
+  #       uses: WyriHaximus/github-action-get-previous-tag@v1
 
-      - name: Generate jar for native
-        run: |
-          cd cli
-          clojure -T:build prod-jar-for-native
-          mv target/clojure-lsp-standalone.jar ..
-          # make cli-jar-for-native
+  #     - name: Generate jar for native
+  #       run: |
+  #         cd cli
+  #         clojure -T:build prod-jar-for-native
+  #         mv target/clojure-lsp-standalone.jar ../clojure-lsp-standalone-win.jar
+  #         # make cli-jar-for-native
 
-      - name: Upload jar
-        uses: actions/upload-artifact@v2
-        with:
-          path: clojure-lsp-standalone.jar
-          name: clojure-lsp-standalone.jar
+  #     - name: Upload jar
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         path: clojure-lsp-standalone-win.jar
+  #         name: clojure-lsp-standalone-win.jar
 
-      # - name: Generate cli bin
-      #   run: |
-      #     cd cli
-      #     clojure -T:build prod-cli
-      #     mv clojure-lsp.exe ..
+  #     # - name: Generate cli bin
+  #     #   run: |
+  #     #     cd cli
+  #     #     clojure -T:build prod-cli
+  #     #     mv clojure-lsp.exe ..
 
-        # run: make prod-cli
+  #       # run: make prod-cli
 
-      # - name: Upload bin
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     path: clojure-lsp
-      #     name: clojure-lsp
+  #     # - name: Upload bin
+  #     #   uses: actions/upload-artifact@v2
+  #     #   with:
+  #     #     path: clojure-lsp
+  #     #     name: clojure-lsp
 
   # linux-amd64:
   #   name: Build native linux amd64 binary
@@ -381,13 +381,14 @@ jobs:
 
   windows:
     name: Build native Windows binary
+    # needs: [build-lib-jar, build-cli-jar-win]
     needs: [build-lib-jar, build-cli-jar-win]
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-        with:
-          name: clojure-lsp-standalone.jar
+      # - uses: actions/checkout@v2
+      # - uses: actions/download-artifact@v2
+      #   with:
+      #     name: clojure-lsp-standalone-win.jar
 
       - name: configure Pagefile
         uses: al-cheb/configure-pagefile-action@v1.2
@@ -416,6 +417,13 @@ jobs:
         with:
           graalvm: 21.3.0
           java: java11
+
+      - name: Generate jar for native
+        run: |
+          cd cli
+          clojure -T:build prod-jar-for-native
+          mv target/clojure-lsp-standalone.jar ..
+          # make cli-jar-for-native
 
       - name: Install native-image component
         run: |

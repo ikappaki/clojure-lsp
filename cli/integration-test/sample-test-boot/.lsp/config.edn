@@ -1,4 +1,2 @@
 {:linters {:clj-kondo {:ns-exclude-regex ""}}
- :log-path "clojure-lsp.integration-test.out"
- :api {:exit-on-errors? false}
- #_#_:experimental {:dep-graph-queries true}}
+ :log-path "clojure-lsp.integration-test.out"}
