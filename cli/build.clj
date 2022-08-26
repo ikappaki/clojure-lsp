@@ -135,7 +135,7 @@
                    "-Dclojure.core.async.go-checking=true"]}))
 
 (defn prod-cli [opts]
-  ;; (prod-jar opts)
+  (prod-jar opts)
   (bin {}))
 
 (defn native-cli [opts]
