@@ -21,29 +21,29 @@ on:
   pull_request:
 
 jobs:
-  # lint:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2.2.0
-  #       with:
-  #         fetch-depth: 0
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.2.0
+        with:
+          fetch-depth: 0
 
-  #     - name: Install Clojure
-  #       uses: DeLaGuardo/setup-clojure@master
-  #       with:
-  #         cli: '1.10.3.1013'
+      - name: Install Clojure
+        uses: DeLaGuardo/setup-clojure@master
+        with:
+          cli: '1.10.3.1013'
 
-  #     - name: Install Babashka
-  #       run: curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install | sudo bash
+      - name: Install Babashka
+        run: curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install | sudo bash
 
-  #     - name: Check if namespaces are clean
-  #       run: make lint-clean
+      - name: Check if namespaces are clean
+        run: make lint-clean
 
-  #     - name: Check if namespaces are formatted
-  #       run: make lint-format
+      - name: Check if namespaces are formatted
+        run: make lint-format
 
-  #     - name: Check if namespaces have no diagnostics
-  #       run: make lint-diagnostics
+      - name: Check if namespaces have no diagnostics
+        run: make lint-diagnostics
 
   # unit-test:
   #   runs-on: ubuntu-latest
@@ -69,45 +69,44 @@ jobs:
   #     - name: Run tests
   #       run: make test
 
-  # jvm-integration-test:
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       jdk: [8, 11, 15, 17]
-  #   steps:
-  #     - uses: actions/checkout@v2.2.0
-  #       with:
-  #         fetch-depth: 0
+  jvm-integration-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        jdk: [8, 11, 15, 17]
+    steps:
+      - uses: actions/checkout@v2.2.0
+        with:
+          fetch-depth: 0
 
-  #     - name: Set up JDK ${{ matrix.jdk }}
-  #       uses: actions/setup-java@v1
-  #       with:
-  #         java-version: ${{ matrix.jdk }}
+      - name: Set up JDK ${{ matrix.jdk }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.jdk }}
 
-  #     - name: Install clojure build tools
-  #       uses: DeLaGuardo/setup-clojure@master
-  #       with:
-  #         cli: '1.10.3.1013'
-  #         lein: '2.9.1'
-  #         boot: '2.8.3'
-  #         bb: '0.9.161'
+      - name: Install clojure build tools
+        uses: DeLaGuardo/setup-clojure@master
+        with:
+          cli: '1.10.3.1013'
+          lein: '2.9.1'
+          boot: '2.8.3'
+          bb: '0.9.161'
 
-  #     - name: Generate embedded binary
-  #       run: make prod-cli
+      - name: Generate embedded binary
+        run: make prod-cli
 
-  #     - name: Run integration tests
-  #       run: make integration-test
+      - name: Run integration tests
+        run: make integration-test
 
-  #     - name: Run babashka pod tests
-  #       run: make pod-test
+      - name: Run babashka pod tests
+        run: make pod-test
 
   jvm-integration-test-windows:
     runs-on: windows-2022
     strategy:
       fail-fast: false
       matrix:
-        # jdk: [8, 11, 15, 17]
         jdk: [8]
     steps:
       - uses: actions/checkout@v2.2.0
@@ -140,10 +139,14 @@ jobs:
           clojure -T:build prod-cli
 
       - name: Run integration tests
-        run: make integration-test
+        run: |
+          cd cli
+          bb integration-test ../clojure-lsp.exe
 
       # - name: Run babashka pod tests
-      #   run: make pod-test
+      #   run: |
+      #     cd cli
+      #     clojure -M:pod-test
 
   # graalvm-build:
   #   runs-on: ubuntu-latest
