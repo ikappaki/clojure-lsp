@@ -52,41 +52,36 @@
              :main 'clojure-lsp.main
              :basis basis})))
 
-(defn ^:private l4j-xml [jar outfile jre-path]
+(defn ^:private l4j-xml
   "Return a launch4j configuration xml document to convert the JAR file
-to an executable at OUTFILE using the java installation at JRE-PATH."
+  to an executable at OUTFILE using the java installation at JRE-PATH
+  and JRE-OPTS."
+  [jar outfile jre-path jvm-opts]
   (-> (with-out-str (xml/emit-element
-                      {:tag :launch4jConfig, :attrs nil,
-                       :content [{:tag :dontWrapJar, :attrs nil, :content ["false"]}
-                                 {:tag :headerType, :attrs nil,  :content ["gui"]}
-                                 {:tag :jar, :attrs nil, :content [jar;; "D:\\src\\clojure-lsp\\clojure-lsp-standalone.jar"
-                                                                   ]}
-                                 {:tag :outfile, :attrs nil, :content [outfile ;; "D:\\src\\clojure-lsp\\clojure-lsp.exe"
-                                                                       ]}
-                                 {:tag :errTitle, :attrs nil, :content nil}
-                                 {:tag :cmdLine, :attrs nil, :content nil}
-                                 {:tag :chdir, :attrs nil, :content ["."]}
-                                 {:tag :priority, :attrs nil, :content ["normal"]}
-                                 {:tag :downloadUrl, :attrs nil, :content ["http://java.com/download"]}
-                                 {:tag :supportUrl, :attrs nil, :content nil}
-                                 {:tag :stayAlive, :attrs nil, :content ["false"]}
-                                 {:tag :restartOnCrash, :attrs nil, :content ["false"]}
-                                 {:tag :manifest, :attrs nil, :content nil}
-                                 {:tag :icon, :attrs nil, :content nil}
-                                 {:tag :jre, :attrs nil, :content
-                                  [{:tag :path, :attrs nil, :content [jre-path
-                                                                      ;; "C:\\Program Files\\Java\\jdk-11.0.7"
-                                                                      ]}
-                                   {:tag :bundledJre64Bit, :attrs nil, :content ["true"]}
-                                   {:tag :bundledJreAsFallback, :attrs nil, :content ["false"]}
-                                   {:tag :minVersion, :attrs nil, :content nil}
-                                   {:tag :maxVersion, :attrs nil, :content nil}
-                                   {:tag :jdkPreference, :attrs nil, :content ["preferJre"]}
-                                   {:tag :runtimeBits, :attrs nil, :content ["64/32"]}]}]}))
+                      {:tag :launch4jConfig :attrs nil
+                       :content [{:tag :dontWrapJar :attrs nil :content ["false"]}
+                                 {:tag :headerType :attrs nil  :content ["console"]}
+                                 {:tag :jar :attrs nil :content [jar]}
+                                 {:tag :outfile :attrs nil :content [outfile]}
+                                 {:tag :chdir :attrs nil :content ["."]}
+                                 {:tag :priority :attrs nil :content ["normal"]}
+                                 {:tag :stayAlive :attrs nil :content ["false"]}
+                                 {:tag :restartOnCrash :attrs nil :content ["false"]}
+                                 {:tag :jre :attrs nil :content
+                                  (into [{:tag :path :attrs nil :content [jre-path]}
+                                         {:tag :bundledJre64Bit :attrs nil :content ["true"]}
+                                         {:tag :bundledJreAsFallback :attrs nil :content ["false"]}
+                                         {:tag :jdkPreference :attrs nil :content ["preferJre"]}
+                                         {:tag :runtimeBits :attrs nil :content ["64/32"]}]
+                                        (for [opt jvm-opts]
+                                          {:tag :opt :attrs nil :content [opt]}))}]}))
       (string/replace #"\r\n" "")))
 
 (defn ^:private bin
-  "Create a binary out of UBER-FILE jar using OPTS.
+  "Create a binary out of UBER-FILE jar with OPTS.
+
+  OPTS can be a map of
+  :jvm-opts A vector of options ot pass to the JVM.
 
   launch4j is uses on MS-Windows for the conversion to binary file. It
   requires its installation path to be either set in the LAUNCH4J_HOME
@@ -96,30 +91,31 @@ to an executable at OUTFILE using the java installation at JRE-PATH."
   [opts]
   (println "Generating bin...")
 
-  (if (fs/windows?)
-    (if-let [l4j (or (some-> (System/getenv "LAUNCH4J_HOME") (fs/path "launch4jc.exe")
-                             (#(when (fs/executable? %) %)))
-                     (fs/which "launch4jc.exe"))]
-      (let [jar (-> (fs/real-path uber-file) .toString)
-            outfile (-> "../clojure-lsp.exe"  fs/absolutize fs/path .toString)
-            java-home (System/getenv "JAVA_HOME")]
-        (fs/with-temp-dir
-          [temp-dir]
-          (let [l4jxml (-> (fs/path temp-dir "l4j.xml") .toString)]
-            (spit l4jxml (l4j-xml jar outfile java-home))
-            (let [{:keys [exit] :as _proc} @(p/process [(.toString l4j) l4jxml]
-                                                       {:dir "."
-                                                        :out :inherit
-                                                        :err :inherit})]
-              (System/exit exit)))))
+  (let [jvm-opts (concat (:jvm-opts opts []) ["-Xmx2g" "-server"])]
+    (if (fs/windows?)
+      (if-let [l4j (or (some-> (System/getenv "LAUNCH4J_HOME") (fs/path "launch4jc.exe")
+                               (#(when (fs/executable? %) %)))
+                       (fs/which "launch4jc.exe"))]
+        (let [jar (-> (fs/real-path uber-file) .toString)
+              outfile (-> "../clojure-lsp.exe"  fs/absolutize fs/path .toString)
+              java-home (System/getenv "JAVA_HOME")]
+          (fs/with-temp-dir
+            [temp-dir]
+            (let [l4jxml (-> (fs/path temp-dir "l4j.xml") .toString)]
+              (spit l4jxml (l4j-xml jar outfile java-home jvm-opts))
+              (let [{:keys [exit] :as _proc} @(p/process [(.toString l4j) l4jxml]
+                                                         {:dir "."
+                                                          :out :inherit
+                                                          :err :inherit})]
+                (System/exit exit)))))
 
-      (throw (Exception. "Cannot locate launch4j.exe either in LAUNCH4J_HOME environment variable or in PATH.")))
+        (throw (Exception. "Cannot locate launch4j.exe either in LAUNCH4J_HOME environment variable or in PATH.")))
 
-    ((requiring-resolve 'deps-bin.impl.bin/build-bin)
-     {:jar uber-file
-      :name "clojure-lsp"
-      :jvm-opts (concat (:jvm-opts opts []) ["-Xmx2g" "-server"])
-      :skip-realign true})))
+      ((requiring-resolve 'deps-bin.impl.bin/build-bin)
+       {:jar uber-file
+        :name "clojure-lsp"
+        :jvm-opts jvm-opts
+        :skip-realign true}))))
 
 (defn debug-jar [opts]
   (uber-aot (merge opts {:extra-aliases [:debug :test]
