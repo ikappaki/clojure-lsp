@@ -53,6 +53,8 @@
              :basis basis})))
 
 (defn ^:private l4j-xml [jar outfile jre-path]
+  "Return a launch4j configuration xml document to convert the JAR file
+to an executable at OUTFILE using the java installation at JRE-PATH."
   (-> (with-out-str (xml/emit-element
                       {:tag :launch4jConfig, :attrs nil,
                        :content [{:tag :dontWrapJar, :attrs nil, :content ["false"]}
@@ -83,7 +85,15 @@
                                    {:tag :runtimeBits, :attrs nil, :content ["64/32"]}]}]}))
       (string/replace #"\r\n" "")))
 
-(defn ^:private bin [opts]
+(defn ^:private bin
+  "Create a binary out of UBER-FILE jar using OPTS.
+
+  launch4j is uses on MS-Windows for the conversion to binary file. It
+  requires its installation path to be either set in the LAUNCH4J_HOME
+  environment variable or included in the PATH env variable. It also
+  requires a java installation path to be set in the JAVA_HOME
+  environment variable."
+  [opts]
   (println "Generating bin...")
 
   (if (fs/windows?)
@@ -93,25 +103,17 @@
       (let [jar (-> (fs/real-path uber-file) .toString)
             outfile (-> "../clojure-lsp.exe"  fs/absolutize fs/path .toString)
             java-home (System/getenv "JAVA_HOME")]
-        (println :jre jar :out outfile :jh java-home)
         (fs/with-temp-dir
           [temp-dir]
-          (println :l l4j)
-          (let [l4jxml ;;"d:/src/clojure-lsp/cli/l4j.xml"
-              ;;"c:/temp/io.xml"
-                (-> (fs/path temp-dir "l4j.xml") .toString)]
-            (println :path l4jxml)
+          (let [l4jxml (-> (fs/path temp-dir "l4j.xml") .toString)]
             (spit l4jxml (l4j-xml jar outfile java-home))
-            (println :out (slurp l4jxml))
-            (let [{:keys [exit] :as _proc} @(p/process [(.toString l4j)
-                                                        l4jxml]
+            (let [{:keys [exit] :as _proc} @(p/process [(.toString l4j) l4jxml]
                                                        {:dir "."
                                                         :out :inherit
                                                         :err :inherit})]
               (System/exit exit)))))
-      ;; (println (pr-str (xml/parse "l4j.xml")))
 
-      (throw (Exception. (str "Cannot find launch4j.exe in path. " (fs/exec-paths)))))
+      (throw (Exception. "Cannot locate launch4j.exe either in LAUNCH4J_HOME environment variable or in PATH.")))
 
     ((requiring-resolve 'deps-bin.impl.bin/build-bin)
      {:jar uber-file
