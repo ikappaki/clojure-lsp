@@ -73,7 +73,7 @@ jobs:
 
       - name: Run tests
         run: |
-          ulimit
+          ulimit -n
           bb test
 
   # jvm-integration-test:
