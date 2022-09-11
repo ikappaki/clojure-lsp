@@ -50,7 +50,7 @@ jobs:
       matrix:
         os: [macos-latest]
         jdk: [8]
-        include:
+        # include:
           # - os: windows-latest
           #   jdk: 8
           # - os: macos-latest
