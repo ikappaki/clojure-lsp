@@ -48,13 +48,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: []
-        jdk: []
+        os: [macos-latest]
+        jdk: [8]
         include:
           # - os: windows-latest
           #   jdk: 8
-          - os: macos-latest
-            jdk: 8
+          # - os: macos-latest
+          #   jdk: 8
     steps:
       - uses: actions/checkout@v2.2.0
         with:
