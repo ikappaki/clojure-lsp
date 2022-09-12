@@ -116,7 +116,7 @@
       (async/>!! output notif)))
   (receive-response [this {:keys [id] :as resp}]
     (if-let [request (get @sent-requests id)]
-      (do (protocols.endpoint/log this :green "received reponse:" resp)
+      (do (protocols.endpoint/log this :green "received response:" resp)
           (swap! sent-requests dissoc id)
           (deliver request (if (:error resp)
                              resp
