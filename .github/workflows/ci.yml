@@ -112,6 +112,8 @@ jobs:
         shell: pwsh
 
       - name: Generate embedded binary
+        env: # only relevant to the MS-Windows job.
+          LAUNCH4J_HOME: "C:\\Program Files (x86)\\Launch4j"
         run: bb prod-cli
 
       - name: Run integration tests
