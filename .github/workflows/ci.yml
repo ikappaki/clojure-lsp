@@ -81,6 +81,7 @@ jobs:
       matrix:
         os: [macos-latest]
         # os: [ubuntu-latest]
+        jdk: [8]
         # jdk: [8, 11, 15, 17]
         # include:
         #   - os: windows-latest
@@ -165,80 +166,80 @@ jobs:
   #     - name: Run babashka pod tests
   #       run: bb pod-test
 
-  graalvm-build:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v2
-      - name: Prepare java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
+  # graalvm-build:
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Prepare java
+  #       uses: actions/setup-java@v1
+  #       with:
+  #         java-version: 11
 
-      - name: Install Clojure
-        uses: DeLaGuardo/setup-clojure@master
-        with:
-          cli: '1.10.3.1013'
-          bb: '0.9.161'
+  #     - name: Install Clojure
+  #       uses: DeLaGuardo/setup-clojure@master
+  #       with:
+  #         cli: '1.10.3.1013'
+  #         bb: '0.9.161'
 
-      - uses: graalvm/setup-graalvm@v1
-        with:
-          version: '22.2.0'
-          java-version: '11'
-          components: 'native-image'
-          native-image-musl: 'true'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+  #     - uses: graalvm/setup-graalvm@v1
+  #       with:
+  #         version: '22.2.0'
+  #         java-version: '11'
+  #         components: 'native-image'
+  #         native-image-musl: 'true'
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Linux native image
-        env:
-          CLOJURE_LSP_XMX: "-J-Xmx6g"
-          CLOJURE_LSP_STATIC: true
-          CLOJURE_LSP_MUSL: true
-        run: |
-          bb native-cli
+  #     - name: Build Linux native image
+  #       env:
+  #         CLOJURE_LSP_XMX: "-J-Xmx6g"
+  #         CLOJURE_LSP_STATIC: true
+  #         CLOJURE_LSP_MUSL: true
+  #       run: |
+  #         bb native-cli
 
-      - name: Compress binary
-        uses: svenstaro/upx-action@v2
-        with:
-          file: clojure-lsp
+  #     - name: Compress binary
+  #       uses: svenstaro/upx-action@v2
+  #       with:
+  #         file: clojure-lsp
 
-      - name: Upload
-        uses: actions/upload-artifact@v2
-        with:
-          name: clojure-lsp-native
-          path: clojure-lsp
+  #     - name: Upload
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: clojure-lsp-native
+  #         path: clojure-lsp
 
-  graalvm-integration-test:
-    needs: graalvm-build
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v2
+  # graalvm-integration-test:
+  #   needs: graalvm-build
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #   steps:
+  #     - uses: actions/checkout@v2
 
-      - name: Install clojure build tools
-        uses: DeLaGuardo/setup-clojure@master
-        with:
-          cli: '1.10.3.1013'
-          lein: '2.9.1'
-          boot: '2.8.3'
-          bb: '0.9.161'
+  #     - name: Install clojure build tools
+  #       uses: DeLaGuardo/setup-clojure@master
+  #       with:
+  #         cli: '1.10.3.1013'
+  #         lein: '2.9.1'
+  #         boot: '2.8.3'
+  #         bb: '0.9.161'
 
-      - uses: actions/download-artifact@v2
-        name: clojure-lsp-native
+  #     - uses: actions/download-artifact@v2
+  #       name: clojure-lsp-native
 
-      - name: Setup binary
-        run: |
-          cp -rf clojure-lsp-native/clojure-lsp cli/clojure-lsp
-          cp -rf clojure-lsp-native/clojure-lsp clojure-lsp
-          chmod +x cli/clojure-lsp
-          chmod +x clojure-lsp
+  #     - name: Setup binary
+  #       run: |
+  #         cp -rf clojure-lsp-native/clojure-lsp cli/clojure-lsp
+  #         cp -rf clojure-lsp-native/clojure-lsp clojure-lsp
+  #         chmod +x cli/clojure-lsp
+  #         chmod +x clojure-lsp
 
-      - name: Run babashka pod tests
-        env:
-          CLOJURE_LSP_TEST_ENV: native
-        run: bb pod-test
+  #     - name: Run babashka pod tests
+  #       env:
+  #         CLOJURE_LSP_TEST_ENV: native
+  #       run: bb pod-test
 
-      - name: Run integration tests
-        run: bb integration-test
+  #     - name: Run integration tests
+  #       run: bb integration-test
