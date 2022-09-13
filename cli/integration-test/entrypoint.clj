@@ -11,10 +11,10 @@
     ;; integration.definition-test
     ;; integration.declaration-test
     ;; integration.implementation-test
-    ;; integration.text-change-test
-    ;; integration.code-action-test
-    ;; integration.completion-test
-    ;; integration.diagnostics-test
+    integration.text-change-test
+    integration.code-action-test
+    integration.completion-test
+    integration.diagnostics-test
     integration.settings-change-test
     integration.formatting-test
     integration.rename-test
