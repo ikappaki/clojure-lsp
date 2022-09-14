@@ -146,10 +146,12 @@
 (defn scan-classpath! [{:keys [db* producer]}]
   (let [db @db*
         root-path (shared/uri->path (:project-root-uri db))]
-    (->> (settings/get db [:project-specs])
-         (filter (partial valid-project-spec? root-path))
-         (mapv #(lookup-classpath-handling-error! % root-path producer))
-         (reduce set/union))))
+    (shared/logging-time
+     "Scanning scanpath process took %s."
+      (->> (settings/get db [:project-specs])
+           (filter (partial valid-project-spec? root-path))
+           (mapv #(lookup-classpath-handling-error! % root-path producer))
+           (reduce set/union)))))
 
 (defn ^:private lein-source-aliases [source-aliases]
   (some->> source-aliases

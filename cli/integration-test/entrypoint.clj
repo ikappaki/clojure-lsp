@@ -7,10 +7,10 @@
 
 (def namespaces
   '[
-    ;; integration.initialize-test
-    ;; integration.definition-test
-    ;; integration.declaration-test
-    ;; integration.implementation-test
+    integration.initialize-test
+    integration.definition-test
+    integration.declaration-test
+    integration.implementation-test
     integration.text-change-test
     integration.code-action-test
     integration.completion-test
@@ -25,11 +25,11 @@
     integration.java-interop-test
     integration.stubs-test
     integration.classpath-test
-    ;; integration.api.version-test
-    ;; integration.api.clean-ns-test
-    ;; integration.api.diagnostics-test
-    ;; integration.api.format-test
-    ;; integration.api.rename-test
+    integration.api.version-test
+    integration.api.clean-ns-test
+    integration.api.diagnostics-test
+    integration.api.format-test
+    integration.api.rename-test
     ])
 
 (defn timeout [timeout-ms callback]
