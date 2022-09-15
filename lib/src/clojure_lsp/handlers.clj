@@ -86,6 +86,8 @@
     (swap! db* assoc :project-analysis-type :project-and-deps)
     (if project-root-uri
       (do
+        (producer/show-message producer ":1-start"
+                               :warning nil)
         (crawler/initialize-project
           project-root-uri
           client-capabilities
@@ -93,6 +95,8 @@
           {}
           work-done-token
           components)
+        (producer/show-message producer ":1-end"
+                               :warning nil)
         (let [db @db*]
           (when (settings/get db [:lint-project-files-after-startup?] true)
             (f.diagnostic/publish-all-diagnostics! (-> db :settings :source-paths) components))

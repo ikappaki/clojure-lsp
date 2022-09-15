@@ -426,12 +426,11 @@
   ;; method, or to `initialized`, but the more general case of being selective
   ;; about which messages are sent when probably needs to be handled in lsp4clj.
   ;; https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initialize
-  (prof/profile
-    (handler/initialize components
-                        (:root-uri params)
-                        (:capabilities params)
-                        (client-settings params)
-                        (some-> params :work-done-token str)))
+  (handler/initialize components
+                      (:root-uri params)
+                      (:capabilities params)
+                      (client-settings params)
+                      (some-> params :work-done-token str))
   (when-let [parent-process-id (:process-id params)]
     (lsp.liveness-probe/start! parent-process-id log-wrapper-fn #(exit server)))
   {:capabilities (capabilities (settings/all @db*))})
