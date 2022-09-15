@@ -73,7 +73,7 @@
 
   (apply require namespaces)
 
-  (let [timeout-minutes 10
+  (let [timeout-minutes 15
         test-results (timeout (* timeout-minutes 60 1000)
                               #(with-log-tail-report
                                  (apply t/run-tests namespaces)))]
@@ -81,7 +81,7 @@
     (when (= test-results :timed-out)
       (print-log-tail!)
       (println)
-      (println "Timeout running integration tests!")
+      (println "Timeout after %d minutes running integration tests!" timeout-minutes)
       (System/exit 1))
 
     (let [{:keys [fail error]} test-results]
