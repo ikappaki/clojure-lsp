@@ -79,15 +79,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest]
-        # os: [ubuntu-latest]
-        jdk: [8]
-        # jdk: [8, 11, 15, 17]
-        # include:
-        #   - os: windows-latest
-        #     jdk: 8
-        #   - os: macos-latest
-        #     jdk: 8
+        os: [ubuntu-latest]
+        jdk: [8, 11, 15, 17]
+        # os: [macos-latest]
+        # jdk: [8]
+        include:
+          - os: windows-latest
+            jdk: 8
+          - os: macos-latest
+            jdk: 8
     steps:
       - uses: actions/checkout@v2.2.0
         with:
@@ -116,17 +116,17 @@ jobs:
       - name: Generate embedded binary
         env: # only relevant to the MS-Windows job.
           LAUNCH4J_HOME: "C:\\Program Files (x86)\\Launch4j"
-        run: bb debug-cli
+        run: bb prod-cli
 
       - name: Run integration tests
         run: |
           bb integration-test
 
-      - name: upload analysis
-        uses: actions/upload-artifact@v3
-        with:
-          name: clj async prof analysis
-          path: /tmp/clj-async-profiler/results
+      # - name: upload analysis
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: clj async prof analysis
+      #     path: /tmp/clj-async-profiler/results
 
       - name: Run babashka pod tests
         run: bb pod-test

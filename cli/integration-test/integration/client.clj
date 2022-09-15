@@ -198,7 +198,7 @@
 
 (defn request-and-await-server-response! [client method body]
   (let [resp (time (deref (protocols.endpoint/send-request client method body)
-                          300000
+                          120000
                           ::timeout))]
     (if (= ::timeout resp)
       (do
