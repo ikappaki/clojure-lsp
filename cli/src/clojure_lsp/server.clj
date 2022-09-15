@@ -1,6 +1,6 @@
 (ns clojure-lsp.server
   (:require
-   [clj-async-profiler.core :as prof]
+   ;; [clj-async-profiler.core :as prof]
 
    [clojure-lsp.clojure-coercer :as clojure-coercer]
    [clojure-lsp.db :as db]
