@@ -116,10 +116,17 @@ jobs:
       - name: Generate embedded binary
         env: # only relevant to the MS-Windows job.
           LAUNCH4J_HOME: "C:\\Program Files (x86)\\Launch4j"
-        run: bb prod-cli
+        run: bb debug-cli
 
       - name: Run integration tests
-        run: bb integration-test
+        run: |
+          bb integration-test
+
+      - name: upload analysis
+        uses: actions/upload-artifact@v3
+        with:
+          name: clj async prof analysis
+          path: /tmp/clj-async-profiler/results
 
       - name: Run babashka pod tests
         run: bb pod-test
