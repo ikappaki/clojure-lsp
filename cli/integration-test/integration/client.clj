@@ -197,9 +197,9 @@
     (:params msg)))
 
 (defn request-and-await-server-response! [client method body]
-  (let [resp (deref (protocols.endpoint/send-request client method body)
-                    300000
-                    ::timeout)]
+  (let [resp (time (deref (protocols.endpoint/send-request client method body)
+                          300000
+                          ::timeout))]
     (if (= ::timeout resp)
       (do
         (protocols.endpoint/log client :red "timeout waiting for server response to client request:" method)

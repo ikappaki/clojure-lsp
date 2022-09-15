@@ -32,17 +32,17 @@
     ;;(is (= 1 2) "forced")
     (is (some #(str/includes? % "datomic-free") classpath))))
 
-;; (deftest claspath-babashka
-;;   (classpath-test-project "sample-test-bb"))
+(deftest claspath-babashka
+  (classpath-test-project "sample-test-bb"))
 
-;; (deftest claspath-boot
-;;   (classpath-test-project "sample-test-boot"))
+(deftest claspath-boot
+  (classpath-test-project "sample-test-boot"))
 
 (deftest claspath-cli
   (classpath-test-project "sample-test"))
 
-;; (deftest claspath-lein
-;;   (classpath-test-project "sample-test-lein"))
+(deftest claspath-lein
+  (classpath-test-project "sample-test-lein"))
 
-;; (deftest claspath-shadow
-;;   (classpath-test-project "sample-test-shadow"))
+(deftest claspath-shadow
+  (classpath-test-project "sample-test-shadow"))
