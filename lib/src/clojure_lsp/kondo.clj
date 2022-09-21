@@ -70,6 +70,8 @@
 (defn db-with-results
   "Update `db` with normalized kondo result."
   [db {:keys [findings config] :as results}]
+  (logger/debug (ex-info "db-with-results" {:findings findings}))
+
   (-> db
       (db-with-analysis results)
       (update :findings merge findings)

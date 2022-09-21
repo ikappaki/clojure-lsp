@@ -34,6 +34,14 @@
                        (println :running-task linter)
                        (run linter))}
 
+         test-stub
+         (dotimes [x 50]
+           (println :x x)
+           (babashka.fs/delete-if-exists "cli/integration-test/sample-test/clojure-lsp.integration-test.out")
+           (when (not= 0 (:exit (babashka.process/shell "bb integration-test")))
+             (System/exit 0))
+           (println :not-found))
+
          release make/release
 
          deploy-clojars make/deploy-clojars
