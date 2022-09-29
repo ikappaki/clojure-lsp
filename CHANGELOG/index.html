@@ -1978,10 +1978,11 @@
 <li>Fix stubs generation issue on MS-Windows, coming out of enabling all integrations tests on windows. #1211</li>
 <li>Improve MS-Windows support by fixing various path, URI and line ending issues coming out of repairing the unit tests suite on windows. #1211</li>
 <li>End dep-graph-queries experiment; clojure-lsp now uses the dep-graph to optimize queries whenever possible</li>
-<li>Bump clj-kondo to <code>2022.09.09-20220918.164105-17</code>. #1226 </li>
+<li>Bump clj-kondo to <code>2022.09.09-20220924.161252-19</code>. #1226 </li>
 <li>Fix issue with changes being reporting with spurious and incorrect line endings on MS-Windows text files. #1211</li>
+<li>Index internal data by URI instead of filename, to minimize conversion between these formats when running queries. #1207</li>
 <li>
-<p>Index internal data by URI instead of filename, to minimize conversion between these formats when running queries. #1207</p>
+<p>Add support to enable trace logs on server via <code>--trace</code> flag. (For latest Emacs's lsp-mode this can be enabled easyly via <code>lsp-clojure-trace-enable</code> variable)</p>
 </li>
 <li>
 <p>Editor</p>
@@ -1992,13 +1993,18 @@
 <li>Support java class decompilation for zipfile scheme (vim users).</li>
 <li>Avoid keeping diagnostics of external closed files for Calva. https://github.com/BetterThanTomorrow/calva/issues/1864</li>
 <li>Lint opened files after a clojure-lsp or clj-kondo config file is saved on disk, avoiding users to re-edit files. #1247</li>
+<li>Allow find definition of java class usages where definition comes from clojure, like defrecords.</li>
+<li>Fix: wait for rename to apply before allowing another rename, to ensure suggested name is correct. #1270</li>
+<li>Process requests in parallel, to prevent typing lag and other performance problems introduced during migration away from lsp4j. #1240</li>
 <li>
-<p>Allow find definition of java class usages where definition comes from clojure, like defrecords.</p>
+<p>Fix: Avoid wrong ns require after <code>Create ns and require</code> code-action/command.</p>
 </li>
 <li>
 <p>API/CLI</p>
 </li>
 <li>Fix missing diagnostics when <code>--project-root</code> is different than current directory. #1245</li>
+<li>Add new <code>dump</code> feature, returning analysis, project information, dependency-graph and others. Check <code>clojure-lsp.api/dump</code> for more information. #744</li>
+<li>Improve CLI output avoiding logs from clj-kondo which are already available via verbose log.</li>
 </ul>
 <h2 id="20220901-152731">2022.09.01-15.27.31<a class="headerlink" href="#20220901-152731" title="Permanent link">#</a></h2>
 <ul>
@@ -3141,7 +3147,7 @@ when multiple files are changed at same time (rename, iedit, etc).</li>
 <div class="md-source-date">
   <small>
     
-      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">September 22, 2022</span>
+      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">September 29, 2022</span>
     
   </small>
 </div>
