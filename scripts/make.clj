@@ -22,7 +22,7 @@
 
   :script The filename of the executable script wrapper."
   [usage]
-  (let [lsp-bin "clojure-lsp-profile"]
+  (let [lsp-bin "clojure-lsp"]
     (case usage
       :native (cond-> lsp-bin windows? (str ".exe"))
       :script (cond-> lsp-bin windows? (str ".bat")))))
