@@ -13,6 +13,7 @@
   ([binary]
    (start-server binary []))
   ([binary args]
+   (println :bi binary :args args)
    (p/process (into [(.getCanonicalPath (io/file binary))] args)
               {:dir "integration-test/sample-test/"})))
 
