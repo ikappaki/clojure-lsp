@@ -7,7 +7,7 @@ if (!$exec)
 }
 
 
-$interval_ms = 200
+$interval_ms = 50
 
 $logdir = "process-usage-logs"
 New-Item -Path $logdir -ItemType directory -Force | Out-Null
@@ -24,7 +24,7 @@ try {
     if (get-process -id $proc.id -ErrorAction SilentlyContinue)
     {
 	"{:exec ""${exec}"" :interval-ms ${interval_ms} :args ""${exec_args}""}" | Add-content $out
-	get-process -id $proc.id -ErrorAction SilentlyContinue| Format-Table | out-string |  % {$_.split([Environment]::NewLine).trim()[2]} | Add-content $out
+	get-process -id $proc.id -ErrorAction SilentlyContinue| Format-Table | out-string |  % { "timestamp(ms) " + $_.split([Environment]::NewLine).trim()[2]} | Add-content $out
     }
     while (get-process -id $proc.id -ErrorAction SilentlyContinue)
     {

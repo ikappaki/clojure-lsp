@@ -12,6 +12,8 @@
  :tasks {get-last-changelog-entry ci/get-last-changelog-entry
          release-artifact clojure-lsp.release-artifact/release
 
+         perf process-usage/analysis
+
          clean make/clean
 
          lib-pom make/lib-pom
