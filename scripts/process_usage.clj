@@ -128,20 +128,20 @@ plot '{{data-path}}' with linespoints pt 7 lc \"black\"")
    (if-not (fs/windows?)
      (ex-info "This task is only available on MS-Windows." {})
 
-     (let [execs-dir (or execs-dir ".")
+     (let [args ["diagnostics" "--dry"]
+           execs-dir (or execs-dir ".")
            execs (->> (fs/list-dir execs-dir "clojure-lsp*.exe")
                       (map str)
                       sort)]
-       (pp/pprint (concat
-                    (for [exec execs]
-                      (do
-                     ;; clean up
-                        (fs/delete-tree ".lsp/.cache")
-                        (fs/delete-tree ".clj-kondo/.cache")
-
-                        (-> (exec-sample exec "diagnostics" "--dry")
-                            plot
-                            str/split-lines)))))))))
+       (-> (for [exec execs]
+             (do
+               (fs/delete-tree ".lsp/.cache")
+               (fs/delete-tree ".clj-kondo/.cache")
+               (-> (apply exec-sample exec args)
+                   plot
+                   str/split-lines)))
+           concat
+           pp/pprint)))))
 
 (comment
   (win-mem-usage-plot)
