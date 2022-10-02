@@ -12,7 +12,7 @@
  :tasks {get-last-changelog-entry ci/get-last-changelog-entry
          release-artifact clojure-lsp.release-artifact/release
 
-         perf process-usage/analysis
+         win-mem-plot process-usage/win-mem-usage-plot
 
          clean make/clean
 
