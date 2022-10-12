@@ -502,6 +502,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#20221005-163951" class="md-nav__link">
+    2022.10.05-16.39.51
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#20220901-152731" class="md-nav__link">
     2022.09.01-15.27.31
   </a>
@@ -1247,6 +1254,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#20221005-163951" class="md-nav__link">
+    2022.10.05-16.39.51
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#20220901-152731" class="md-nav__link">
     2022.09.01-15.27.31
   </a>
@@ -1973,16 +1987,23 @@
                 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">#</a></h1>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">#</a></h2>
 <ul>
+<li>Editor</li>
+<li>Add refactorings to change param order of <code>defn</code>/<code>defmacro</code>, also changing call sites. #1131</li>
+<li>Avoid shadowing existing locals when restructuring keys. #1229</li>
+</ul>
+<h2 id="20221005-163951">2022.10.05-16.39.51<a class="headerlink" href="#20221005-163951" title="Permanent link">#</a></h2>
+<ul>
 <li>General</li>
 <li>Improve clj-depend merge config to overwrite <code>source-paths</code> only if it is nil or empty.  #1264</li>
 <li>Fix stubs generation issue on MS-Windows, coming out of enabling all integrations tests on windows. #1211</li>
 <li>Improve MS-Windows support by fixing various path, URI and line ending issues coming out of repairing the unit tests suite on windows. #1211</li>
 <li>End dep-graph-queries experiment; clojure-lsp now uses the dep-graph to optimize queries whenever possible</li>
-<li>Bump clj-kondo to <code>2022.09.09-20220924.161252-19</code>. #1226 </li>
+<li>Bump clj-kondo to <code>2022.10.05</code>. #1226 </li>
 <li>Fix issue with changes being reporting with spurious and incorrect line endings on MS-Windows text files. #1211</li>
 <li>Index internal data by URI instead of filename, to minimize conversion between these formats when running queries. #1207</li>
+<li>Add support to enable trace logs on server via <code>--trace</code> flag. (For latest Emacs's lsp-mode this can be enabled easyly via <code>lsp-clojure-trace-enable</code> variable)</li>
 <li>
-<p>Add support to enable trace logs on server via <code>--trace</code> flag. (For latest Emacs's lsp-mode this can be enabled easyly via <code>lsp-clojure-trace-enable</code> variable)</p>
+<p>Bump graalvm version for MS-Windows to 22.2.0, in sync with the other archs. #1211</p>
 </li>
 <li>
 <p>Editor</p>
@@ -1996,8 +2017,10 @@
 <li>Allow find definition of java class usages where definition comes from clojure, like defrecords.</li>
 <li>Fix: wait for rename to apply before allowing another rename, to ensure suggested name is correct. #1270</li>
 <li>Process requests in parallel, to prevent typing lag and other performance problems introduced during migration away from lsp4j. #1240</li>
+<li>Fix: Avoid wrong ns require after <code>Create ns and require</code> code-action/command.</li>
+<li>Fix: Avoid errors when a file starts with a comment. #1252</li>
 <li>
-<p>Fix: Avoid wrong ns require after <code>Create ns and require</code> code-action/command.</p>
+<p>Bump promesa to <code>9.0.462</code> and use it for parallel request processing.</p>
 </li>
 <li>
 <p>API/CLI</p>
@@ -2245,7 +2268,7 @@
 <li>Bump <code>org.clojure/clojure</code> to <code>1.11.0</code>.</li>
 <li>Fix move-coll-entry to maintain cursor position instead of a range. #862</li>
 <li>
-<p>Clean ns automatically after adding missing require/imports, enabled by default under new <code>:clean :after-ns-refactor</code> flag. #558</p>
+<p>Clean ns automatically after adding missing require/imports, enabled by default under new <code>:clean :automatically-after-ns-refactor</code> flag. #558</p>
 </li>
 <li>
 <p>Editor</p>
@@ -3147,7 +3170,7 @@ when multiple files are changed at same time (rename, iedit, etc).</li>
 <div class="md-source-date">
   <small>
     
-      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">September 29, 2022</span>
+      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">October 12, 2022</span>
     
   </small>
 </div>
