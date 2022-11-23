@@ -207,11 +207,15 @@
   
 
 
-  <li class="md-tabs__item">
-    <a href="../api/" class="md-tabs__link">
-      API
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../api/what-is-it/" class="md-tabs__link">
+        Outside editor (API)
+      </a>
+    </li>
+  
 
       
         
@@ -437,10 +441,104 @@
 
 
 
+  
+  <li class="md-nav__item md-nav__item--nested">
+    
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" >
+    
+    <label class="md-nav__link" for="nav-4">
+      Outside editor (API)
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Outside editor (API)" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Outside editor (API)
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+
   <li class="md-nav__item">
-    <a href="../api/" class="md-nav__link">
-      API
+    <a href="../api/what-is-it/" class="md-nav__link">
+      What is clojure-lsp API?
     </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../api/api/" class="md-nav__link">
+      API (JVM)
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../api/cli/" class="md-nav__link">
+      CLI
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../api/ci/" class="md-nav__link">
+      CI
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../api/lein-plugin/" class="md-nav__link">
+      Lein plugin
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+
+  <li class="md-nav__item">
+    <a href="../api/bb-pod/" class="md-nav__link">
+      Babashka pod
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
   </li>
 
     
@@ -497,6 +595,13 @@
         <li class="md-nav__item">
   <a href="#unreleased" class="md-nav__link">
     Unreleased
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20221103-001457" class="md-nav__link">
+    2022.11.03-00.14.57
   </a>
   
 </li>
@@ -1254,6 +1359,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#20221103-001457" class="md-nav__link">
+    2022.11.03-00.14.57
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#20221005-163951" class="md-nav__link">
     2022.10.05-16.39.51
   </a>
@@ -1988,8 +2100,30 @@
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">#</a></h2>
 <ul>
 <li>General</li>
+<li>Only publish progress on initialize if client provided a <code>workDoneProgress</code>. #1363</li>
+<li>Bump clj-kondo to <code>2022.11.03-20221116.204630-13</code>.</li>
 <li>
-<p>Bump clj-kondo to <code>2022.10.14</code>.</p>
+<p>Avoid wrong clj-kondo configs in case clojure-lsp process is spawned from a different directory than project-root.</p>
+</li>
+<li>
+<p>Editor</p>
+</li>
+<li>Show better icons for multimethods, var-arg fns, protocols, records, interfaces and types on <code>workspace/symbol</code> and <code>textDocument/documentSymbol</code>.</li>
+<li>Inlining the last binding of a let removes the let. #210</li>
+<li>
+<p>Allow import java classes via code-actions <code>Add import 'x.y.Z'</code>.</p>
+</li>
+<li>
+<p>API/CLI</p>
+</li>
+<li>Allow specify analysis type for <code>dump</code> command, default to analyze project only analysis. #1383</li>
+</ul>
+<h2 id="20221103-001457">2022.11.03-00.14.57<a class="headerlink" href="#20221103-001457" title="Permanent link">#</a></h2>
+<ul>
+<li>General</li>
+<li>Bump clj-kondo to <code>2022.11.02</code> avoiding breaking changes on custom hooks.</li>
+<li>
+<p>Bump graalvm to 22.3.0. #1345</p>
 </li>
 <li>
 <p>Editor</p>
@@ -2001,6 +2135,9 @@
 <li>Bump lsp4clj to <code>1.5.0</code></li>
 <li>For users with fewer cores, avoid unnecessary waits for file analysis.</li>
 <li>Reduce CPU usage by aborting requests that the client won't use.</li>
+<li>Fix to mark some code actions as preferred, so editors can emphasize them. https://github.com/clojure-lsp/lsp4clj/issues/32</li>
+<li>Adds java classes completions, since clj-kondo now knows all java classes defined on external dependencies. #1329</li>
+<li>Fix completion to consider required namespaces without alias or refers. #1352</li>
 </ul>
 <h2 id="20221005-163951">2022.10.05-16.39.51<a class="headerlink" href="#20221005-163951" title="Permanent link">#</a></h2>
 <ul>
@@ -3181,7 +3318,7 @@ when multiple files are changed at same time (rename, iedit, etc).</li>
 <div class="md-source-date">
   <small>
     
-      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">October 18, 2022</span>
+      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">November 23, 2022</span>
     
   </small>
 </div>
@@ -3204,7 +3341,7 @@ when multiple files are changed at same time (rename, iedit, etc).</li>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../api/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../api/bb-pod/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -3213,7 +3350,7 @@ when multiple files are changed at same time (rename, iedit, etc).</li>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                API
+                Babashka pod
               </div>
             </div>
           </a>
