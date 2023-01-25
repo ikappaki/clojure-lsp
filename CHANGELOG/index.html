@@ -600,6 +600,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#20221209-155110" class="md-nav__link">
+    2022.12.09-15.51.10
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#20221103-001457" class="md-nav__link">
     2022.11.03-00.14.57
   </a>
@@ -1359,6 +1366,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#20221209-155110" class="md-nav__link">
+    2022.12.09-15.51.10
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#20221103-001457" class="md-nav__link">
     2022.11.03-00.14.57
   </a>
@@ -2100,23 +2114,63 @@
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">#</a></h2>
 <ul>
 <li>General</li>
-<li>Only publish progress on initialize if client provided a <code>workDoneProgress</code>. #1363</li>
-<li>Bump clj-kondo to <code>2022.11.03-20221116.204630-13</code>.</li>
+<li>Bump clj-kondo to <code>2023.01.20</code></li>
+<li>Avoid false-positives of unused-public-var for functions used in :gen-class that starts with <code>-</code> as convention. #1443</li>
+<li>New jar available on releases: <code>clojure-lsp-server.jar</code>, an Uberjar not aot-ed containing both clojure-lsp core + server code, improving startup time for JVM clients, for example for <code>lein-clojure-lsp</code>. Any lib using <code>clojure-lsp-standalone.jar</code> should consider switch to this new jar.</li>
+<li>Change <code>:source-paths-ignore-regex</code> default value to <code>["target.*"]</code>, removing resource folders. #1452</li>
+<li>Bump cljfmt to 0.9.2</li>
 <li>
-<p>Avoid wrong clj-kondo configs in case clojure-lsp process is spawned from a different directory than project-root.</p>
+<p>Bump lsp4clj to 1.7.0</p>
+</li>
+<li>
+<p>Editor</p>
+</li>
+<li>Fix add missing import code action when there are multiple options. #1422</li>
+<li>Only show completion items if no changed code is being processed, avoiding wrong completion items. #1425</li>
+<li>Improve semantic tokens for defprotocol, definterface coloring as <code>interface</code> tokens.</li>
+<li>Include reffered vars in completion. #1440</li>
+<li>Allow rename alias of function calls, renaming properly both function usages and alias definition.</li>
+<li>Add support for keyword analysis in edn files, allowing find-references, document highlight and other lsp features to keywords.</li>
+<li>find-definition and references for quoted symbols like <code>'clojure.core/inc</code> and symbols mentioned in <code>.edn</code> files. #1446</li>
+<li>
+<p>Show error messages when can't apply edits after commands. #1448</p>
+</li>
+<li>
+<p>API/CLI</p>
+</li>
+<li>Make diagnostics command print as json or edn. #1419</li>
+<li>Make possible starting a chan server with clojure-lsp components, useful to other clients extend.</li>
+<li>Consider edn files when linting project, allowing to format edn files. #1452</li>
+<li>Report diagnostics lines and columns as 1 based, not 0 like LSP, following clj-kondo standard. #1459</li>
+</ul>
+<h2 id="20221209-155110">2022.12.09-15.51.10<a class="headerlink" href="#20221209-155110" title="Permanent link">#</a></h2>
+<ul>
+<li>General</li>
+<li>Fix rename issue with VS-Code/Calva on MS-Windows. #1388</li>
+<li>Only publish progress on initialize if client provided a <code>workDoneProgress</code>. #1363</li>
+<li>Bump clj-kondo to <code>2022.12.08</code>.</li>
+<li>Avoid wrong clj-kondo configs in case clojure-lsp process is spawned from a different directory than project-root.</li>
+<li>
+<p>Fall back on CLJS var when finding definition from Clojure and nothing was found. #1403</p>
 </li>
 <li>
 <p>Editor</p>
 </li>
 <li>Show better icons for multimethods, var-arg fns, protocols, records, interfaces and types on <code>workspace/symbol</code> and <code>textDocument/documentSymbol</code>.</li>
 <li>Inlining the last binding of a let removes the let. #210</li>
+<li>Allow import java classes via code-actions <code>Add import 'x.y.Z'</code>.</li>
+<li>Make <code>add-import</code> command/code-action smarter, checking if there is already a package import to just include the classname instead of full import.</li>
+<li>Add new refactoring <code>cycle-keyword-auto-resolve</code>, e.g. <code>::bar</code> -&gt; <code>:foo/bar</code> and vice-versa. #1128</li>
+<li>Supporting find definition/references/implementations of <code>definterface</code>.</li>
 <li>
-<p>Allow import java classes via code-actions <code>Add import 'x.y.Z'</code>.</p>
+<p>Avoid watching ignored source-paths, causing find-definition/references and other features go to wrong files.</p>
 </li>
 <li>
 <p>API/CLI</p>
 </li>
 <li>Allow specify analysis type for <code>dump</code> command, default to analyze project only analysis. #1383</li>
+<li>Add <code>:result</code> to the dump command. #1390</li>
+<li>Important regression fix where clojure-lsp may do inconsistent lint when classpath scan fail without showing to user the error.</li>
 </ul>
 <h2 id="20221103-001457">2022.11.03-00.14.57<a class="headerlink" href="#20221103-001457" title="Permanent link">#</a></h2>
 <ul>
@@ -3318,7 +3372,7 @@ when multiple files are changed at same time (rename, iedit, etc).</li>
 <div class="md-source-date">
   <small>
     
-      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">November 24, 2022</span>
+      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">January 25, 2023</span>
     
   </small>
 </div>
