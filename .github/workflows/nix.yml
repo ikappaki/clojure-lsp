@@ -1,0 +1,37 @@
+name: nix build check
+
+on:
+  workflow_dispatch: # allows manual triggering
+  push:
+    paths-ignore:
+      - '**/README.md'
+      - '**/CHANGELOG.md'
+      - 'resources/CLOJURE_LSP_VERSION'
+      - 'docs/**'
+      - 'images/**'
+      - 'mkdocs.yml'
+      - 'deps-lock.json'
+      - '.github/workflows/bump_deps.yml'
+      - '.github/workflows/bump_downstreams.yml'
+      - '.github/workflows/ci.yml'
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/release.yml'
+
+jobs:
+  nix-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Install Cachix
+        uses: cachix/cachix-action@v12
+        with:
+          name: clj-nix-ci
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
+      - name: unit tests
+        run: |
+          nix develop --command bb test
