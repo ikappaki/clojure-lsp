@@ -41,6 +41,8 @@
                 bb cli-prod-jar
                 cp clojure-lsp-standalone.jar target
               '';
+            doCheck = true;
+            checkPhase = "bb test";
             maven-extra = [{
               content =
                 ''
