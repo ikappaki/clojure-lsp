@@ -1,7 +1,6 @@
-name: nix build check
+name: nix verification
 
 on:
-  workflow_dispatch: # allows manual triggering
   push:
     paths-ignore:
       - '**/README.md'
@@ -19,6 +18,8 @@ on:
 
 jobs:
   nix-test:
+    # Confirms that the clojure lsp flake builds fine and passes
+    # testing.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -32,6 +33,8 @@ jobs:
           name: clj-nix-ci
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
-      - name: unit tests
+      - name: build & test
         run: |
-          nix develop --command bb test
+          nix build
+
+
