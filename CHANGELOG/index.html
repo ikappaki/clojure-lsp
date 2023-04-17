@@ -600,6 +600,27 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#20230227-131212" class="md-nav__link">
+    2023.02.27-13.12.12
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20230226-234605" class="md-nav__link">
+    2023.02.26-23.46.05
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20230126-110816" class="md-nav__link">
+    2023.01.26-11.08.16
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#20221209-155110" class="md-nav__link">
     2022.12.09-15.51.10
   </a>
@@ -1366,6 +1387,27 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#20230227-131212" class="md-nav__link">
+    2023.02.27-13.12.12
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20230226-234605" class="md-nav__link">
+    2023.02.26-23.46.05
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20230126-110816" class="md-nav__link">
+    2023.01.26-11.08.16
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#20221209-155110" class="md-nav__link">
     2022.12.09-15.51.10
   </a>
@@ -2114,13 +2156,60 @@
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">#</a></h2>
 <ul>
 <li>General</li>
+<li>Fix reflection issue in JDK19 with <code>Thread/sleep</code> #1520</li>
+<li>Bump clj-kondo to <code>2023.04.14</code>, fixing analysis inconsistencies with <code>schema.core</code></li>
+<li>Ignore vars defined wrongly via config. #1510</li>
+<li>
+<p>Add support for <code>:output {:langs true}</code> in clj-kondo config to show <code>.cljc</code> language contexts</p>
+</li>
+<li>
+<p>Editor</p>
+</li>
+<li>Fix classpath issue message to properly ignore or retry after user input. #1500</li>
+<li>Decreate debounce time for calculating changes and diagnostics, improving UX in cost of performance, it doesn't seem to highly affect performance though.</li>
+<li>Add new setting to change diagnostics range type. #1530</li>
+<li>Spec compliance: avoid registering client capabilities if dynamic registration is not set. #1535</li>
+<li>Improve java support: using new <code>java-member-definitions</code> analysis, first feature is the allow completion of static members (fields and methods) for java classes.</li>
+<li>Show edn tree when in edn files via <code>documentSymbol</code> feature.</li>
+<li>Improve java db cache consistency + analysis performance.</li>
+</ul>
+<h2 id="20230227-131212">2023.02.27-13.12.12<a class="headerlink" href="#20230227-131212" title="Permanent link">#</a></h2>
+<ul>
+<li>Editor</li>
+<li>Fix exception on hover feature on graal images.</li>
+</ul>
+<h2 id="20230226-234605">2023.02.26-23.46.05<a class="headerlink" href="#20230226-234605" title="Permanent link">#</a></h2>
+<ul>
+<li>General</li>
+<li>Add new setting <code>:paths-ignore-regex</code> to allow ignore analyzing/linting specific paths, useful if you have folders or files that are not relevant to be linted and are huge which may affect performance.</li>
+<li>Bump clj-kondo. Fixes missing lint class constructors, making clojure-lsp show add import code action always.</li>
+<li>
+<p>Fix wrong ns rename for cljc files. #1508</p>
+</li>
+<li>
+<p>Editor</p>
+</li>
+<li>Fix cache issue: wrong external dependencies analysis when running clojure-lsp in editor after running on CLI, affecting navigation. #1473</li>
+<li>Bump lsp4clj fixing progress notifications during initialization for Calva.</li>
+<li>Allow go to definition of namespace even when the var is not known. Ex: <code>clojure.string/foo</code> will go to the definition of <code>clojure.string</code>. This is useful for cases where the var was not created yet but user wants to go to the ns to check the available functions or check the correct name of the function.</li>
+<li>Avoid basing results on old analysis.</li>
+<li>Add new setting <code>:completion :analysis-type</code> to choose between <code>:fast-but-stale</code>(default) or <code>:slow-but-accurate</code>, this should define whether completion should wait for changes that may still happening, this by default reverts the behavior introduced after #1425. #1487</li>
+<li>Fix <code>textDocument/hover</code> issue when doc metadata isn't a string literal.</li>
+<li>Follow references to other vars in doc metadata for use in <code>textDocument/hover</code>.</li>
+<li>Support <code>:arglists</code> meta when finding docs of functions via hover feature. #1504</li>
+<li>Enhance hover to search clojuredocs on CLJS. #1506</li>
+</ul>
+<h2 id="20230126-110816">2023.01.26-11.08.16<a class="headerlink" href="#20230126-110816" title="Permanent link">#</a></h2>
+<ul>
+<li>General</li>
 <li>Bump clj-kondo to <code>2023.01.20</code></li>
 <li>Avoid false-positives of unused-public-var for functions used in :gen-class that starts with <code>-</code> as convention. #1443</li>
 <li>New jar available on releases: <code>clojure-lsp-server.jar</code>, an Uberjar not aot-ed containing both clojure-lsp core + server code, improving startup time for JVM clients, for example for <code>lein-clojure-lsp</code>. Any lib using <code>clojure-lsp-standalone.jar</code> should consider switch to this new jar.</li>
 <li>Change <code>:source-paths-ignore-regex</code> default value to <code>["target.*"]</code>, removing resource folders. #1452</li>
 <li>Bump cljfmt to 0.9.2</li>
+<li>Bump lsp4clj to 1.7.0</li>
 <li>
-<p>Bump lsp4clj to 1.7.0</p>
+<p>Support <code>:style/indent</code> metadata for indentation with cljfmt #1420</p>
 </li>
 <li>
 <p>Editor</p>
@@ -3372,7 +3461,7 @@ when multiple files are changed at same time (rename, iedit, etc).</li>
 <div class="md-source-date">
   <small>
     
-      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">January 25, 2023</span>
+      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">April 17, 2023</span>
     
   </small>
 </div>

@@ -4,9 +4,11 @@
  :source-aliases #{:dev :test}
  :project-specs [] ;; Check the default at clojure-lsp.classpath/default-project-specs
  :source-paths-ignore-regex ["target.*"]
+ :paths-ignore-regex []
  :lint-project-files-after-startup? true
  :notify-references-on-file-change true
  :compute-external-file-changes true
+ :diagnostics {:range-type :full}
  :linters {:clj-kondo {:level :on
                        :report-duplicates true
                        :ns-exclude-regex ""}
@@ -22,7 +24,8 @@
  :hover {:hide-file-location? false
          :arity-on-same-line? false
          :clojuredocs true}
- :completion {:additional-edits-warning-text nil}
+ :completion {:additional-edits-warning-text nil
+              :analysis-type :fast-but-stale}
  :java {:jdk-source-uri "https://raw.githubusercontent.com/clojure-lsp/jdk-source/main/openjdk-19/reduced/source.zip" ; "file:///usr/lib/jvm/java-17-openjdk/lib/src.zip"
         :home-path nil ;; jdk-source-uri takes precedence
         :download-jdk-source? false

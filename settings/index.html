@@ -1272,6 +1272,11 @@
 <td><code>true</code></td>
 </tr>
 <tr>
+<td><code>:completion</code> <code>:analysis-type</code></td>
+<td>The type for analysis to be performed during the completion, accepted values are <code>fast-but-stale</code> which won't wait for remaining analysis to complete to process the completion and <code>slow-but-accurate</code> which will wait for any changes on document to then process the completion items.</td>
+<td><code>:fast-but-stale</code></td>
+</tr>
+<tr>
 <td><code>:completion</code> <code>:additional-edits-warning-text</code></td>
 <td>A warning to show when the completion will perform additional edits, such as requiring a new alias. Appears in the completion items' documentation.</td>
 <td><code>nil</code></td>
@@ -1317,6 +1322,11 @@
 <td><code>["target.*"]</code></td>
 </tr>
 <tr>
+<td><code>:analysis-paths-ignore-regex</code></td>
+<td>list of regex to filter paths to be analyzed. Useful for excluding huge files or folders that may affect final analysis size and performance, like huge edn files.</td>
+<td><code>[]</code></td>
+</tr>
+<tr>
 <td><code>:java</code> <code>:download-jdk-source?</code></td>
 <td>Whether to download JDK source from <code>:java :jdk-source-download-uri</code> and cache after startup for JDK classes java support.</td>
 <td><code>false</code></td>
@@ -1345,6 +1355,11 @@
 <td><code>:lint-project-files-after-startup?</code></td>
 <td>Whether to async lint all project only files after startup to make features like <a href="https://emacs-lsp.github.io/lsp-mode/page/main-features/#project-errors-on-modeline">List project errors</a> work.</td>
 <td><code>true</code></td>
+</tr>
+<tr>
+<td><code>:diagnostics :range-type</code></td>
+<td>which range use for diagnostics, <code>:full</code> makes the range be the whole affected diagnostic while <code>:simple</code> makes the range be the first character of the diagnostic.</td>
+<td><code>:full</code></td>
 </tr>
 <tr>
 <td><code>:linters</code></td>
@@ -1614,7 +1629,7 @@ The available settings inside <code>:stubs</code> are:</p>
 <div class="md-source-date">
   <small>
     
-      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">January 23, 2023</span>
+      Last update: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">April 16, 2023</span>
     
   </small>
 </div>
