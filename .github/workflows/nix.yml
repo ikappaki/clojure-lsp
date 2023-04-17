@@ -23,7 +23,6 @@ jobs:
     # Confirms that the clojure lsp flake builds fine.
     runs-on: ubuntu-latest
     steps:
-    steps:
     - uses: actions/checkout@v3
     - uses: cachix/install-nix-action@v19
       with:
