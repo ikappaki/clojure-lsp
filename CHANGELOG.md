@@ -7,6 +7,7 @@
   - Bump clj-kondo to `2023.04.14`, fixing analysis inconsistencies with `schema.core`
   - Ignore vars defined wrongly via config. #1510
   - Add support for `:output {:langs true}` in clj-kondo config to show `.cljc` language contexts
+  - Update flake.nix to build with babashka. #1373
 
 - Editor
   - Fix classpath issue message to properly ignore or retry after user input. #1500
